@@ -210,19 +210,21 @@ module.exports = {
 
   [CSRF_REFERER_CHECK]() {
     const { refererWhiteList } = this.app.config.security.csrf;
-    const referer = (this.headers.referer || '').toLowerCase();
+    // check Origin/Referer headers
+    const referer = (this.headers.referer || this.headers.origin || '').toLowerCase();
+
     if (!referer) {
-      debug('missing csrf referer');
-      this[LOG_CSRF_NOTICE]('missing csrf referer');
-      return 'missing csrf referer';
+      debug('missing csrf referer or origin');
+      this[LOG_CSRF_NOTICE]('missing csrf referer or origin');
+      return 'missing csrf referer or origin';
     }
 
     const host = utils.getFromUrl(referer, 'host');
     const domainList = refererWhiteList.concat(this.host);
     if (!host || !utils.isSafeDomain(host, domainList)) {
-      debug('verify referer error');
-      this[LOG_CSRF_NOTICE]('invalid csrf referer');
-      return 'invalid csrf referer';
+      debug('verify referer or origin error');
+      this[LOG_CSRF_NOTICE]('invalid csrf referer or origin');
+      return 'invalid csrf referer or origin';
     }
   },
 
