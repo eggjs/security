@@ -3,15 +3,15 @@
 Security plugin in egg
 
 [![NPM version][npm-image]][npm-url]
-[![Node.js CI](https://github.com/eggjs/egg-security/actions/workflows/nodejs.yml/badge.svg)](https://github.com/eggjs/egg-security/actions/workflows/nodejs.yml)
+[![Node.js CI](https://github.com/eggjs/security/actions/workflows/nodejs.yml/badge.svg)](https://github.com/eggjs/security/actions/workflows/nodejs.yml)
 [![Test coverage][codecov-image]][codecov-url]
 [![Known Vulnerabilities][snyk-image]][snyk-url]
 [![npm download][download-image]][download-url]
 
 [npm-image]: https://img.shields.io/npm/v/egg-security.svg?style=flat-square
 [npm-url]: https://npmjs.org/package/egg-security
-[codecov-image]: https://codecov.io/gh/eggjs/egg-security/branch/master/graph/badge.svg
-[codecov-url]: https://codecov.io/gh/eggjs/egg-security
+[codecov-image]: https://codecov.io/gh/eggjs/security/branch/master/graph/badge.svg
+[codecov-url]: https://codecov.io/gh/eggjs/security
 [snyk-image]: https://snyk.io/test/npm/egg-security/badge.svg?style=flat-square
 [snyk-url]: https://snyk.io/test/npm/egg-security
 [download-image]: https://img.shields.io/npm/dm/egg-security.svg?style=flat-square
@@ -559,10 +559,10 @@ exports.security = {
 
 ## License
 
-[MIT](https://github.com/eggjs/egg-security/blob/master/LICENSE)
+[MIT](LICENSE)
 
 ## Contributors
 
-[![Contributors](https://contrib.rocks/image?repo=eggjs/egg-security)](https://github.com/eggjs/egg-security/graphs/contributors)
+[![Contributors](https://contrib.rocks/image?repo=eggjs/security)](https://github.com/eggjs/security/graphs/contributors)
 
 Made with [contributors-img](https://contrib.rocks).

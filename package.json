@@ -54,7 +54,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/eggjs/egg-security.git"
+    "url": "git+https://github.com/eggjs/security.git"
   },
   "files": [
     "agent.js",
@@ -67,7 +67,7 @@
   "bugs": {
     "url": "https://github.com/eggjs/egg/issues"
   },
-  "homepage": "https://github.com/eggjs/egg-security#readme",
+  "homepage": "https://github.com/eggjs/security#readme",
   "author": "jtyjty99999",
   "license": "MIT"
 }

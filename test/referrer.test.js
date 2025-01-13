@@ -44,7 +44,7 @@ describe('test/referrer.test.js', () => {
         .expect(500);
     });
 
-    // check for fix https://github.com/eggjs/egg-security/pull/50
+    // check for fix https://github.com/eggjs/security/pull/50
     it('should throw error when Referrer-Policy is set to index of item in ALLOWED_POLICIES_ENUM', () => {
       const policy = 0;
       return app2.httpRequest()
