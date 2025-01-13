@@ -547,7 +547,7 @@ describe('test/csrf.test.js', () => {
       .set('host', 'nodejs.org')
       .expect(403);
 
-    yield this.app.httpRequest()
+    await app.httpRequest()
       .post('/update')
       .set('accept', 'text/html')
       .set('origin', 'https://wwwnodejs.org/en/')
