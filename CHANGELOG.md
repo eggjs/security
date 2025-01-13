@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.7.0](https://github.com/eggjs/egg-security/compare/v3.6.0...v3.7.0) (2025-01-13)
+
+
+### Features
+
+* csrf support check origin header with referer type ([#69](https://github.com/eggjs/egg-security/issues/69)) ([2c950d3](https://github.com/eggjs/egg-security/commit/2c950d3d2a464c5f4d3af79bc7ea32c7595018c6))
+
 ## [3.6.0](https://github.com/eggjs/egg-security/compare/v3.5.0...v3.6.0) (2024-07-08)
 
 
