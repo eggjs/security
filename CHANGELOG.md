@@ -1,3 +1,105 @@
+# Changelog
+
+## [3.6.0](https://github.com/eggjs/egg-security/compare/v3.5.0...v3.6.0) (2024-07-08)
+
+
+### Features
+
+* add hostnameExceptionList for ssrf ([#100](https://github.com/eggjs/egg-security/issues/100)) ([92a34f3](https://github.com/eggjs/egg-security/commit/92a34f3246ded7ebb5c628d1de2a37a121ce919d))
+
+## [3.5.0](https://github.com/eggjs/egg-security/compare/v3.4.0...v3.5.0) (2024-07-03)
+
+
+### Features
+
+* add rotateWhenInvalid option for CSRF token ([#98](https://github.com/eggjs/egg-security/issues/98)) ([ae37c8f](https://github.com/eggjs/egg-security/commit/ae37c8f8e55c050ec6747a196f77aec197958e02))
+
+## [3.4.0](https://github.com/eggjs/egg-security/compare/v3.3.1...v3.4.0) (2024-07-01)
+
+
+### Features
+
+* support SSRF check on useHttpClientNext = true ([#96](https://github.com/eggjs/egg-security/issues/96)) ([1d6bfff](https://github.com/eggjs/egg-security/commit/1d6bfffba257aae9bb72906cbe958550d00adfb7))
+
+## [3.3.1](https://github.com/eggjs/egg-security/compare/v3.3.0...v3.3.1) (2024-06-12)
+
+
+### Bug Fixes
+
+* use @eggjs/ip instead of ip ([#95](https://github.com/eggjs/egg-security/issues/95)) ([5e3ee95](https://github.com/eggjs/egg-security/commit/5e3ee95bd3d4fb133800669284b0d9d15ac4f0f8))
+
+## [3.3.0](https://github.com/eggjs/egg-security/compare/v3.2.0...v3.3.0) (2024-05-29)
+
+
+### Features
+
+* use ip@v2 ([#93](https://github.com/eggjs/egg-security/issues/93)) ([ffb761d](https://github.com/eggjs/egg-security/commit/ffb761dd6e364fd7eb1d034a6fb1f3a060855f80))
+
+## [3.2.0](https://github.com/eggjs/egg-security/compare/v3.1.0...v3.2.0) (2024-01-04)
+
+
+### Features
+
+* CSRF cookies allow the use of signatures ([#88](https://github.com/eggjs/egg-security/issues/88)) ([da1b532](https://github.com/eggjs/egg-security/commit/da1b53222448bb646ad6fb1d726a6168a43eafcf))
+
+## [3.1.0](https://github.com/eggjs/egg-security/compare/v3.0.0...v3.1.0) (2023-08-09)
+
+
+### Features
+
+* context 中的 `isSafeDomain()` 函数增加自定义白名单参数 ([#86](https://github.com/eggjs/egg-security/issues/86)) ([a178552](https://github.com/eggjs/egg-security/commit/a1785525fc1acb5d0e329dd1446c3bc8b4f6e72f))
+
+## [3.0.0](https://github.com/eggjs/egg-security/compare/v2.11.0...v3.0.0) (2023-05-10)
+
+
+### ⚠ BREAKING CHANGES
+
+* drop Node.js < 14 support
+
+### Features
+
+* upgrade deps to latest versions ([#82](https://github.com/eggjs/egg-security/issues/82)) ([c3ca817](https://github.com/eggjs/egg-security/commit/c3ca817eca2fa6a034f9402f6ad5c4a8e9194178))
+
+2.11.0 / 2022-07-20
+==================
+
+**features**
+  * [[`b97b2b2`](http://github.com/eggjs/egg-security/commit/b97b2b292d249eee69822baa8fe62da9161597d2)] - feat: csrf cookie support cookieOptions (#80) (大木匠贰 <<damujiangr@aliyun.com>>)
+
+2.10.1 / 2022-04-10
+==================
+
+**others**
+  * [[`4bb4741`](http://github.com/eggjs/egg-security/commit/4bb47419f0f9a8703401e0ee1f0b7d496519c587)] - 🐛 FIX: Add warning message on `false` value config (#79) (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`184d109`](http://github.com/eggjs/egg-security/commit/184d109dc0e83f2568bbfcf5837f4a8aadb9eff8)] - 📖 DOC: Add CONNECT method on CSRF default config (fengmk2 <<fengmk2@gmail.com>>)
+
+2.10.0 / 2022-04-05
+==================
+
+**features**
+  * [[`2d1b28f`](http://github.com/eggjs/egg-security/commit/2d1b28f94cee80f931d25d9b0905b2b2b10e195f)] - feat: make csrf supported method configurable (#74) (Anemone95 <<x565178035@126.com>>)
+
+**others**
+  * [[`59558fa`](http://github.com/eggjs/egg-security/commit/59558faf0a5e0fca29f2703a65be91364f708867)] - 🐛 FIX: Should detect all rules before ignore on CSRF (#78) (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`61a5543`](http://github.com/eggjs/egg-security/commit/61a5543391d6a29050ddf12d39d3997811143852)] - deps: use nanoid@3 (#77) (fengmk2 <<fengmk2@gmail.com>>)
+
+2.9.1 / 2022-03-29
+==================
+
+**fixes**
+  * [[`0b3fb1e`](http://github.com/eggjs/egg-security/commit/0b3fb1ebd9107c555f15cc97722a5a390a98e1e5)] - fix: should match script end tags like </script > (#76) (fengmk2 <<fengmk2@gmail.com>>)
+
+**others**
+  * [[`1cde817`](http://github.com/eggjs/egg-security/commit/1cde8178e0058136f62203752622efe02467fa3b)] - 🤖 TEST: Run ci on GitHub Action (#75) (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`23fef7d`](http://github.com/eggjs/egg-security/commit/23fef7d3a4150afa4e001be186bc191c08878a75)] - Delete SECURITY.md (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`f6aeb97`](http://github.com/eggjs/egg-security/commit/f6aeb977203db5686fe279d0e8b3ec1a64535e07)] - docs: Add Security Policy (fengmk2 <<fengmk2@gmail.com>>)
+
+2.9.0 / 2021-04-21
+==================
+
+**others**
+  * [[`9d80e90`](http://github.com/eggjs/egg-security/commit/9d80e90d273a3ac24231d200ac248f44d1fbd822)] - add ssrf.ipExceptionList (#70) (shadyzoz <<shadyzoz@icloud.com>>)
+  * [[`79c38e0`](http://github.com/eggjs/egg-security/commit/79c38e001b431466361c711680d975eb0cfcb301)] - docs: fix typos (#68) (viko16 <<viko16@users.noreply.github.com>>)
 
 2.8.0 / 2020-04-16
 ==================
@@ -241,4 +343,3 @@
 ==================
 
   * First version
-

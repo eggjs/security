@@ -1,67 +1,61 @@
-'use strict';
-
-require('should-http');
+const { strict: assert } = require('node:assert');
 const mm = require('egg-mock');
-const assert = require('assert');
 
-describe('test/hsts.test.js', function() {
-  describe('server', function() {
-    before(function* () {
-      this.app = mm.app({
+describe('test/hsts.test.js', () => {
+  let app;
+  let app2;
+  let app3;
+  describe('server', () => {
+    before(async () => {
+      app = mm.app({
         baseDir: 'apps/hsts',
         plugin: 'security',
       });
-      yield this.app.ready();
-      this.app2 = mm.app({
+      await app.ready();
+      app2 = mm.app({
         baseDir: 'apps/hsts-nosub',
         plugin: 'security',
       });
-      yield this.app2.ready();
-      this.app3 = mm.app({
+      await app2.ready();
+      app3 = mm.app({
         baseDir: 'apps/hsts-default',
         plugin: 'security',
       });
-      yield this.app3.ready();
+      await app3.ready();
     });
 
     afterEach(mm.restore);
 
-    it('should contain not Strict-Transport-Security header with default', function(done) {
-      this.app3.httpRequest()
+    it('should contain not Strict-Transport-Security header with default', async () => {
+      const res = await app3.httpRequest()
         .get('/')
         .set('accept', 'text/html')
-        .expect(200)
-        .end(function(err, res) {
-          assert(!res.headers['strict-transport-security']);
-          done();
-        });
+        .expect(200);
+      assert.equal(res.headers['strict-transport-security'], undefined);
     });
 
-    it('should contain Strict-Transport-Security header when configured', function(done) {
-      this.app2.httpRequest()
+    it('should contain Strict-Transport-Security header when configured', () => {
+      return app2.httpRequest()
         .get('/')
         .set('accept', 'text/html')
         .expect('Strict-Transport-Security', 'max-age=31536000')
-        .expect(200)
-        .end(done);
+        .expect(200);
     });
 
-    it('should contain includeSubdomains rule when defined', function(done) {
-      this.app.httpRequest()
+    it('should contain includeSubdomains rule when defined', () => {
+      return app.httpRequest()
         .get('/')
         .set('accept', 'text/html')
         .expect('Strict-Transport-Security', 'max-age=31536000; includeSubdomains')
-        .expect(200)
-        .end(done);
+        .expect(200);
     });
 
-    it('should not contain includeSubdomains rule with this.securityOptions', function(done) {
-      this.app.httpRequest()
+    it('should not contain includeSubdomains rule with this.securityOptions', () => {
+      return app.httpRequest()
         .get('/nosub')
         .set('accept', 'text/html')
         .expect('Strict-Transport-Security', 'max-age=31536000')
-        .expect(200)
-        .end(done);
+        .expect(200);
     });
   });
 });

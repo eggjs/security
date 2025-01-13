@@ -7,3 +7,5 @@ npm-debug.log
 run/
 .vscode
 package-lock.json
+.travis.yml
+.idea

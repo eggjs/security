@@ -1,37 +1,31 @@
-'use strict';
-
-require('should-http');
+const { strict: assert } = require('node:assert');
 const mm = require('egg-mock');
-const assert = require('assert');
 
-describe('test/noopen.test.js', function() {
-
-  describe('server', function() {
-    before(function(done) {
-      this.app = mm.app({
-        baseDir: 'apps/noopen',
-        plugin: 'security',
-      });
-      this.app.ready(done);
+describe('test/noopen.test.js', () => {
+  let app;
+  before(() => {
+    app = mm.app({
+      baseDir: 'apps/noopen',
+      plugin: 'security',
     });
+    return app.ready();
+  });
 
-    afterEach(mm.restore);
+  afterEach(mm.restore);
 
-    it('should return default download noopen http header', function(done) {
-      this.app.httpRequest()
-        .get('/')
-        .set('accept', 'text/html')
-        .expect('X-Download-Options', 'noopen')
-        .expect(200, done);
-    });
+  it('should return default download noopen http header', () => {
+    return app.httpRequest()
+      .get('/')
+      .set('accept', 'text/html')
+      .expect('X-Download-Options', 'noopen')
+      .expect(200);
+  });
 
-    it('should not return download noopen http header', function(done) {
-      this.app.httpRequest()
-        .get('/disable')
-        .set('accept', 'text/html')
-        .expect(res => assert(!res.headers['x-download-options']))
-        .expect(200, done);
-    });
-
+  it('should not return download noopen http header', async () => {
+    const res = await app.httpRequest()
+      .get('/disable')
+      .set('accept', 'text/html')
+      .expect(200);
+    assert.equal(res.headers['x-download-options'], undefined);
   });
 });

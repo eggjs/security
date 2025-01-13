@@ -3,20 +3,15 @@
 Security plugin in egg
 
 [![NPM version][npm-image]][npm-url]
-[![build status][travis-image]][travis-url]
+[![Node.js CI](https://github.com/eggjs/egg-security/actions/workflows/nodejs.yml/badge.svg)](https://github.com/eggjs/egg-security/actions/workflows/nodejs.yml)
 [![Test coverage][codecov-image]][codecov-url]
-[![David deps][david-image]][david-url]
 [![Known Vulnerabilities][snyk-image]][snyk-url]
 [![npm download][download-image]][download-url]
 
 [npm-image]: https://img.shields.io/npm/v/egg-security.svg?style=flat-square
 [npm-url]: https://npmjs.org/package/egg-security
-[travis-image]: https://img.shields.io/travis/eggjs/egg-security.svg?style=flat-square
-[travis-url]: https://travis-ci.org/eggjs/egg-security
 [codecov-image]: https://codecov.io/gh/eggjs/egg-security/branch/master/graph/badge.svg
 [codecov-url]: https://codecov.io/gh/eggjs/egg-security
-[david-image]: https://img.shields.io/david/eggjs/egg-security.svg?style=flat-square
-[david-url]: https://david-dm.org/eggjs/egg-security
 [snyk-image]: https://snyk.io/test/npm/egg-security/badge.svg?style=flat-square
 [snyk-url]: https://snyk.io/test/npm/egg-security
 [download-image]: https://img.shields.io/npm/dm/egg-security.svg?style=flat-square
@@ -27,7 +22,7 @@ Egg's default security plugin, generally no need to configure.
 ## Install
 
 ```bash
-$ npm i egg-security
+npm i egg-security
 ```
 
 ## Usage & configuration
@@ -44,7 +39,7 @@ exports.security = {
 
 ### Disable security precautions
 
-If you want to disable some security precautions, set `enable` porperty to 'false' directly.
+To disable some security precautions, set `enable` property to 'false' directly.
 
 For example, disable xframe defense:
 
@@ -101,7 +96,7 @@ There are times when we want to be more flexible to configure security plugins.F
 1. To decide whether to enable or disable the xframe security header from the context of the request.
 2. To decide csp policies from different request urls.
 
-Then we can configure `ctx.securityOptions[name] opts` in the custom middleware or controller,then the current request configuration will overrides the default configuration (new configuration will be merged and override the default project configuration, but only take effect in the current request)
+Then we can configure `ctx.securityOptions[name] opts` in the custom middleware or controller, then the current request configuration will override the default configuration (new configuration will be merged and override the default project configuration, but only take effect in the current request)
 
 ```js
 async ctx => {
@@ -117,7 +112,7 @@ async ctx => {
 }
 ```
 
-Not all security plugins support dynamic configuration, only following plugins list support
+Not all security plugins support dynamic configuration, only the following plugins list support
 
 - csp
 - hsts
@@ -145,7 +140,6 @@ ctx.securityOptions.shtml = {
 - `ctx.securityOptions` the current request configuration will overrides the default configuration, but it does not make a deep copy，so pay attention to configure `csp.policy`, it will not be merged.
 - If you configure `ctx.securityOptions`，please write unit tests to ensure the code is correct.
 
-
 ## API
 
 ### ctx.isSafeDomain(domain)
@@ -166,7 +160,7 @@ exports.security = {
 
 __usage__
 
-* `ctx.csrf` getter for CSRF token
+- `ctx.csrf` getter for CSRF token
 
 Generally used when send POST form request. When page rendering, put `ctx.csrf` into form hidden field or query string.(`_csrf` is the key).
 When submitting the form, please submit with the `_csrf` token parameter.
@@ -220,10 +214,17 @@ exports.security = {
     headerName: 'x-csrf-token', // request csrf token's name in header
     bodyName: '_csrf',          // request csrf token's name in body
     queryName: '_csrf',         // request csrf token's name in query
+    rotateWhenInvalid: false,   // rotate csrf secret when csrf token invalid. For multi applications which be deployed on the same domain, as tokens from one application may impact others.
     refererWhiteList: [],       // referer white list
+    supportedRequests: [        // supported URL path and method, the package will match URL path regex patterns one by one until path matched. We recommend you set {path: /^\//, methods:['POST','PATCH','DELETE','PUT','CONNECT']} as the last rule in the list, which is also the default config.
+      {path: /^\//, methods:['POST','PATCH','DELETE','PUT','CONNECT']}
+    ],
+    cookieOptions: {},          // csrf token's cookie options
   },
 }
 ```
+
+`methods` in `supportedRequests` can be empty, which means if you set `supportedRequests: [{path: /.*/, methods:[]}]`, the whole csrf protection will be disabled.
 
 #### Rotate CSRF secret
 
@@ -231,9 +232,9 @@ Must call `ctx.rotateCsrfSecret()` when user login to ensure each user has indep
 
 ### safe redirect
 
-* `ctx.redirect(url)` If url is not in the configuration of the white list, the redirect will be prohibited
+- `ctx.redirect(url)` If url is not in the configuration of the white list, the redirect will be prohibited
 
-* `ctx.unsafeRedirect(url)` Not Recommended;
+- `ctx.unsafeRedirect(url)` Not Recommended;
 
 Security plugin override `ctx.redirect` method，all redirects will be judged by the domain name.
 
@@ -253,13 +254,13 @@ Based on [jsonp-body](https://github.com/node-modules/jsonp-body).
 
 Defense:
 
-* The longest callback function name limit of 50 characters.
-* Callback function only allows "[","]","a-zA-Z0123456789_", "$" "." to prevent `xss` or `utf-7` attack.
+- The longest callback function name limit of 50 characters.
+- Callback function only allows "[","]","a-zA-Z0123456789_", "$" "." to prevent `xss` or `utf-7` attack.
 
 Config：
 
-* callback function default name `_callback`.
-* limit - function name limit, default by 50.
+- callback function default name `_callback`.
+- limit - function name limit, default by 50.
 
 ## helper
 
@@ -283,7 +284,7 @@ Used for url in html tags (like `<a href=""/><img src=""/>`),please do not call 
 
   `helper.surl($value)`。
 
-** Mention: Particular attention, if you need to resolve URL use `surl`，`surl` need warpped in quotes, Otherwise will lead to XSS vulnerability.**
+**Mention: Particular attention, if you need to resolve URL use `surl`，`surl` need warpped in quotes, Otherwise will lead to XSS vulnerability.**
 
 Example: do not use surl
 
@@ -344,7 +345,7 @@ console.log(`var foo = "${ctx.helper.sjs(foo)}";`);
 If you want to output richtexts in views, you need to use `shtml` helper.
 It will do XSS filter, then output html tags to avoid illegal scripts.
 
-** shtml is a very complex process, it will effect server performance, so if you do not need to output HTML, please do not use shtml.**
+**shtml is a very complex process, it will effect server performance, so if you do not need to output HTML, please do not use shtml.**
 
 Examples:
 
@@ -364,7 +365,7 @@ const value = `<a href="http://www.domain.com">google</a><script>evilcode…</sc
 shtml based on [xss](https://github.com/leizongmin/js-xss/), and add filter by domain feature.
 
 - [default rule](https://github.com/leizongmin/js-xss/blob/master/lib/default.js)
-- custom rule http://jsxss.com/zh/options.html
+- custom rule <http://jsxss.com/zh/options.html>
 
 For example, only support `a` tag, and filter all attributes except for `title`:
 
@@ -390,9 +391,9 @@ ${helper.shtml($html)}
 ```
 
 Commonly used `data-xx` property is not in the whitelist, so it will be filtered.
-So please check the applicable scenarios for `shtml`, it usually used for richtext submmited by user.
+So please check the applicable scenarios for `shtml`, it is usually used for rich-text submitted by user.
 
-A usage error will limit functions, also affect the performance of the server.
+A usage error will limit functions, and also affect the performance of the server.
 Such scenes are generally forums, comments, etc.
 
 Even if the forum does not support the HTML content input, do not use this helper, you can directly use `escape` instead.
@@ -421,7 +422,7 @@ If you want to output json in javascript without encoding, it will be a risk for
 sjson supports json encode，it will iterate all keys in json, then escape all characters in the value to `\x` to avoid XSS attack, and keep the json structure unchanged.
 If you want to output json string in your views, please use `${ctx.helper.sjson(var)}`to escape.
 
-**it has a very complex process and will lost performance, so avoid the use as far as possible**
+__it has a very complex process and will lost performance, so avoid the use as far as possible__
 
 example:
 
@@ -457,7 +458,6 @@ after fix:
 
 Escape command line arguments. Add single quotes around a string and quotes/escapes any existing single quotes allowing you to pass a string directly to a shell function and having it be treated as a single safe argument.
 
-
 ```js
 const ip = '127.0.0.1 && cat /etc/passwd'
 const cmd = 'ping -c 1 ' + this.helper.escapeShellArg(ip);
@@ -470,7 +470,6 @@ console.log(cmd);
 
 Command line escape to remove the following characters from the entered command line: ```#&;`|*?~<>^()[]{}$;'", 0x0A and 0xFF```
 
-
 ```js
 const ip = '127.0.0.1 && cat /etc/passwd'
 const cmd = 'ping -c 1 ' + this.helper.escapeShellCmd(ip);
@@ -481,7 +480,7 @@ console.log(cmd);
 
 ## Security Headers
 
-Refer to [lusca](https://github.com/krakenjs/lusca), appriciate for their works.
+Refer to [lusca](https://github.com/krakenjs/lusca), appreciate their work.
 
 ### hsts Strict-Transport-Security
 
@@ -490,30 +489,29 @@ Disabled by default. If your website based on https, we recommend you should ena
 - maxAge one year by default `365 * 24 * 3600`
 - includeSubdomains false by default
 
-
 ### csp
 
-Default disabled. If you need to enable, please contact your security engineers and determine the opening strategy
+Default disabled. If you need to enable it, please contact your security engineers and determine the opening strategy
 
 - policy policies used by csp
 
 ### X-Download-Options:noopen
 
-Default enabled, disable IE download dialog automatically open download file and will cause XSS
+Default enabled, disable IE download dialog automatically opens download file and will cause XSS
 
 ### X-Content-Type-Options:nosniff
 
-Disable IE8's auto MIME sniffing. E.g: take `text/plain` as `text/html` by mistake and render it, especially when there's something untrusted in the local service.
+Disable IE8's auto MIME sniffing. E.g.: take `text/plain` as `text/html` by mistake and render it, especially when there's something untrusted in the local service.
 
 ### X-Frame-Options
 
-Defaulting to "SAMEORIGIN", only allow iframe embed by same origin.
+Defaulting to "SAMEORIGIN", only allows iframe to embed by the same origin.
 
 - value Defaulting to `SAMEORIGIN`
 
 ### X-XSS-Protection
 
-- disable Defaulting to `false`，same as `1; mode=block`.
+- disable Defaulting to `false`, the same as `1; mode=block`.
 
 ### SSRF Protection
 
@@ -523,18 +521,29 @@ In a [Server-Side Request Forgery (SSRF)](https://www.owasp.org/index.php/Server
 
 #### Configuration
 
-* ipBlackList(Array) - specific which ip are illegal when request with `safeCurl`.
-* checkAddress(Function) - determine the ip by the function's return value, `false` means illegal ip.
+- ipBlackList(Array) - specific which IP addresses are illegal when requested with `safeCurl`.
+- ipExceptionList(Array) - specific which IP addresses are legal within ipBlackList.
+hostnameExceptionList(Array) - specifies which hostnames are legal within ipBlackList.
+- checkAddress(Function) - determine the ip by the function's return value, `false` means illegal ip.
 
 ```js
 // config/config.default.js
 exports.security = {
   ssrf: {
-    // support both cidr subnet or specific ip
+    // support both cidr subnet or specific IP
     ipBlackList: [
       '10.0.0.0/8',
       '127.0.0.1',
       '0.0.0.0/32',
+    ],
+    // support both cidr subnet or specific IP
+    ipExceptionList: [
+      '10.1.1.1',
+      '10.10.0.1/24',
+    ],
+    // legal hostname
+    hostnameExceptionList: [
+      'example.com',
     ],
     // checkAddress has higher priority than ipBlackList
     checkAddress(ip) {
@@ -546,20 +555,14 @@ exports.security = {
 
 ## Other
 
-* Forbid `trace` `track` http methods.
-
-<!-- GITCONTRIBUTOR_START -->
-
-## Contributors
-
-|[<img src="https://avatars3.githubusercontent.com/u/985607?v=4" width="100px;"/><br/><sub><b>dead-horse</b></sub>](https://github.com/dead-horse)<br/>|[<img src="https://avatars0.githubusercontent.com/u/156269?v=4" width="100px;"/><br/><sub><b>fengmk2</b></sub>](https://github.com/fengmk2)<br/>|[<img src="https://avatars0.githubusercontent.com/u/40081831?v=4" width="100px;"/><br/><sub><b>Maledong</b></sub>](https://github.com/Maledong)<br/>|[<img src="https://avatars0.githubusercontent.com/u/893152?v=4" width="100px;"/><br/><sub><b>jtyjty99999</b></sub>](https://github.com/jtyjty99999)<br/>|[<img src="https://avatars1.githubusercontent.com/u/360661?v=4" width="100px;"/><br/><sub><b>popomore</b></sub>](https://github.com/popomore)<br/>|[<img src="https://avatars0.githubusercontent.com/u/456108?v=4" width="100px;"/><br/><sub><b>shaoshuai0102</b></sub>](https://github.com/shaoshuai0102)<br/>|
-| :---: | :---: | :---: | :---: | :---: | :---: |
-[<img src="https://avatars1.githubusercontent.com/u/19343?v=4" width="100px;"/><br/><sub><b>ai</b></sub>](https://github.com/ai)<br/>|[<img src="https://avatars3.githubusercontent.com/u/7298095?v=4" width="100px;"/><br/><sub><b>guoshencheng</b></sub>](https://github.com/guoshencheng)<br/>|[<img src="https://avatars2.githubusercontent.com/u/227713?v=4" width="100px;"/><br/><sub><b>atian25</b></sub>](https://github.com/atian25)<br/>|[<img src="https://avatars0.githubusercontent.com/u/7480584?v=4" width="100px;"/><br/><sub><b>EliYao</b></sub>](https://github.com/EliYao)<br/>
-
-This project follows the git-contributor [spec](https://github.com/xudafeng/git-contributor), auto updated at `Fri Mar 08 2019 10:02:52 GMT+0800`.
-
-<!-- GITCONTRIBUTOR_END -->
+- Forbid `trace` `track` http methods.
 
 ## License
 
 [MIT](https://github.com/eggjs/egg-security/blob/master/LICENSE)
+
+## Contributors
+
+[![Contributors](https://contrib.rocks/image?repo=eggjs/egg-security)](https://github.com/eggjs/egg-security/graphs/contributors)
+
+Made with [contributors-img](https://contrib.rocks).

@@ -1,8 +1,6 @@
-'use strict';
-
+const assert = require('node:assert');
 const safeRedirect = require('./lib/safe_redirect');
 const utils = require('./lib/utils');
-const assert = require('assert');
 
 module.exports = app => {
   app.config.coreMiddleware.push('securities');

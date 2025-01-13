@@ -1,11 +1,9 @@
-'use strict';
-
-module.exports = function(app) {
-  app.get('/testcsp', function *(){
+module.exports = app => {
+  app.get('/testcsp', async function() {
     this.body = this.nonce;
   });
 
-  app.get('/testcsp/custom', function*() {
+  app.get('/testcsp/custom', async function() {
     this.securityOptions.csp = {
       policy: {
         'script-src': [
@@ -26,7 +24,7 @@ module.exports = function(app) {
     this.body = this.nonce;
   });
 
-  app.get('/testcsp/disable', function*() {
+  app.get('/testcsp/disable', async function() {
     this.securityOptions.csp = {
       enable: false,
     };

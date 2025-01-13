@@ -1,7 +1,5 @@
-'use strict';
-
-module.exports = function(app) {
-  app.get('/testcsp', function*() {
+module.exports = app => {
+  app.get('/testcsp', async function() {
     this.body = this.nonce;
   });
 };

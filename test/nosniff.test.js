@@ -1,7 +1,5 @@
-'use strict';
-
+const { strict: assert } = require('node:assert');
 const mm = require('egg-mock');
-const assert = require('assert');
 
 describe('test/nosniff.test.js', function() {
 

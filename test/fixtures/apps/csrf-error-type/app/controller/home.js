@@ -1,15 +1,13 @@
-'use strict';
-
-exports.index = function* () {
+exports.index = async function() {
   this.body = this.csrf;
 };
 
-exports.rotate = function* () {
+exports.rotate = async function() {
   this.rotateCsrfSecret();
   this.body = this.csrf;
 };
 
-exports.update = function* () {
+exports.update = async function() {
   this.session.body = this.request.body;
   this.body = this.request.body;
 };

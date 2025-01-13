@@ -1,6 +1,6 @@
 'use strict';
 
-const ip = require('ip');
+const ip = require('@eggjs/ip');
 const Benchmark = require('benchmark');
 const benchmarks = require('beautify-benchmark');
 const suite = new Benchmark.Suite();

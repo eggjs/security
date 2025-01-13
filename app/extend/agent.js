@@ -1,7 +1,5 @@
-'use strict';
-
-const safeCurl = require('../../lib/extend/safe_curl');
+const { safeCurlForApplication } = require('../../lib/extend/safe_curl');
 
 module.exports = {
-  safeCurl,
+  safeCurl: safeCurlForApplication,
 };

@@ -1,10 +1,9 @@
 'use strict';
 
-const safeCurl = require('../../lib/extend/safe_curl');
-const isSafeDomainUtil = require('../../lib/utils').isSafeDomain;
-const nanoid = require('nanoid/non-secure');
+const debug = require('node:util').debuglog('egg-security:context');
+const { nanoid } = require('nanoid/non-secure');
 const Tokens = require('csrf');
-const debug = require('debug')('egg-security:context');
+const { safeCurlForContext } = require('../../lib/extend/safe_curl');
 const utils = require('../../lib/utils');
 
 const tokens = new Tokens();
@@ -39,12 +38,15 @@ module.exports = {
   /**
    * Check whether the specific `domain` is in / matches the whiteList or not.
    * @param {string} domain The assigned domain.
+   * @param {Array<string>} customWhiteList The custom white list for domain.
    * @return {boolean} If the domain is in / matches the whiteList, return true;
    * otherwise false.
    */
-  isSafeDomain(domain) {
-    const domainWhiteList = this.app.config.security.domainWhiteList;
-    return isSafeDomainUtil(domain, domainWhiteList);
+  // TODO: add customWhiteList option document.
+  isSafeDomain(domain, customWhiteList) {
+    const domainWhiteList = customWhiteList && customWhiteList.length > 0 ? customWhiteList : this.app.config.security.domainWhiteList;
+    // const domainWhiteList = this.app.config.security.domainWhiteList;
+    return utils.isSafeDomain(domain, domainWhiteList);
   },
 
   // Add nonce, random characters will be OK.
@@ -80,7 +82,7 @@ module.exports = {
    */
   get [CSRF_SECRET]() {
     if (this[_CSRF_SECRET]) return this[_CSRF_SECRET];
-    let { useSession, cookieName, sessionName } = this.app.config.security.csrf;
+    let { useSession, cookieName, sessionName, cookieOptions = {} } = this.app.config.security.csrf;
     // get secret from session or cookie
     if (useSession) {
       this[_CSRF_SECRET] = this.session[sessionName] || '';
@@ -88,7 +90,7 @@ module.exports = {
       // cookieName support array. so we can change csrf cookie name smoothly
       if (!Array.isArray(cookieName)) cookieName = [ cookieName ];
       for (const name of cookieName) {
-        this[_CSRF_SECRET] = this.cookies.get(name, { signed: false }) || '';
+        this[_CSRF_SECRET] = this.cookies.get(name, { signed: cookieOptions.signed || false }) || '';
         if (this[_CSRF_SECRET]) break;
       }
     }
@@ -105,17 +107,18 @@ module.exports = {
     debug('ensure csrf secret, exists: %s, rotate; %s', this[CSRF_SECRET], rotate);
     const secret = tokens.secretSync();
     this[NEW_CSRF_SECRET] = secret;
-    let { useSession, sessionName, cookieDomain, cookieName } = this.app.config.security.csrf;
+    let { useSession, sessionName, cookieDomain, cookieName, cookieOptions = {} } = this.app.config.security.csrf;
 
     if (useSession) {
       this.session[sessionName] = secret;
     } else {
-      const cookieOpts = {
+      const defaultOpts = {
         domain: cookieDomain && cookieDomain(this),
         signed: false,
         httpOnly: false,
         overwrite: true,
       };
+      const cookieOpts = utils.merge(defaultOpts, cookieOptions);
       // cookieName support array. so we can change csrf cookie name smoothly
       if (!Array.isArray(cookieName)) cookieName = [ cookieName ];
       for (const name of cookieName) {
@@ -197,6 +200,10 @@ module.exports = {
     if (token !== this[CSRF_SECRET] && !tokens.verify(this[CSRF_SECRET], token)) {
       debug('verify secret and token error');
       this[LOG_CSRF_NOTICE]('invalid csrf token');
+      const { rotateWhenInvalid } = this.app.config.security.csrf;
+      if (rotateWhenInvalid) {
+        this.rotateCsrfSecret();
+      }
       return 'invalid csrf token';
     }
   },
@@ -227,5 +234,5 @@ module.exports = {
     }
   },
 
-  safeCurl,
+  safeCurl: safeCurlForContext,
 };

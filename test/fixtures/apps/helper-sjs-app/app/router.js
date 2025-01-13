@@ -1,15 +1,10 @@
-'use strict';
-
-require('should');
-
-module.exports = function(app) {
-
-  app.get('/sjs', function*() {
+module.exports = app => {
+  app.get('/sjs', async function() {
     const foo = '"hello"123abc"';
     this.body = `var foo = "${foo}"; var foo = "${this.helper.sjs(foo)}";` === 'var foo = ""hello"123abc""; var foo = "\\x22hello\\x22123abc\\x22";';
   });
 
-  app.get('/sjs-2', function*() {
+  app.get('/sjs-2', async function() {
 
     let foo = '';
     let res = ''
@@ -28,7 +23,7 @@ module.exports = function(app) {
     this.body = `${this.helper.sjs(foo)}` === res;
   });
 
-  app.get('/sjs-3', function*() {
+  app.get('/sjs-3', async function() {
 
     let foo = '';
     let res = ''
@@ -47,7 +42,7 @@ module.exports = function(app) {
     this.body = `${this.helper.sjs(foo)}` === res;
   });
 
-  app.get('/sjs-4', function*() {
+  app.get('/sjs-4', async function() {
 
     const map = {
       '\t': '\\t',
@@ -76,6 +71,4 @@ module.exports = function(app) {
     }
     this.body = `${this.helper.sjs(foo)}` === res;
   });
-
-
 };

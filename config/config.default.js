@@ -42,11 +42,19 @@ module.exports = () => {
       headerName: 'x-csrf-token',
       bodyName: '_csrf',
       queryName: '_csrf',
+      rotateWhenInvalid: false,
+      supportedRequests: [
+        { path: /^\//, methods: [ 'POST', 'PATCH', 'DELETE', 'PUT', 'CONNECT' ] },
+      ],
 
       // These config works when using referer type
       refererWhiteList: [
         // 'eggjs.org'
       ],
+      // csrf token's cookie options
+      cookieOptions: {
+        signed: false,
+      },
     },
 
     xframe: {
@@ -94,6 +102,8 @@ module.exports = () => {
 
     ssrf: {
       ipBlackList: null,
+      ipExceptionList: null,
+      hostnameExceptionList: null,
       checkAddress: null,
     },
   };

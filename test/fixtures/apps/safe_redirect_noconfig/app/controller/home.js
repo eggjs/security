@@ -1,11 +1,9 @@
-'use strict';
-
-exports.safeRedirect = function* () {
+exports.safeRedirect = async function() {
   const goto = this.query.goto;
   this.redirect(goto);
 };
 
-exports.unSafeRedirect = function* () {
+exports.unSafeRedirect = async function() {
   const goto = this.query.goto;
   this.unsafeRedirect(goto);
 };

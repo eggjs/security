@@ -7,5 +7,5 @@ exports.security = {
   xframe: {
     ignore: ['/ignore1', '/ignore2'],
     enable: true
-  }
+  },
 };

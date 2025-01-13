@@ -1,7 +1,12 @@
 'use strict';
 
 const mm = require('egg-mock');
-const sleep = require('mz-modules/sleep');
+
+function sleep(ms) {
+  return new Promise(resolve => {
+    setTimeout(resolve, ms);
+  });
+}
 
 describe('test/dta.test.js', () => {
   let app;

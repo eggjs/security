@@ -1,254 +1,200 @@
-'use strict';
-
-require('should-http');
-const should = require('should');
+const { strict: assert } = require('node:assert');
 const mm = require('egg-mock');
-const utils = require('..').utils;
-const pedding = require('pedding');
+const { utils } = require('..');
 
-describe('test/utils.test.js', function() {
-  describe('utils.isSafeDomain', function() {
-    before(function(done) {
-      this.app = mm.app({
+describe('test/utils.test.js', () => {
+  afterEach(mm.restore);
+  describe('utils.isSafeDomain', () => {
+    let app;
+    before(() => {
+      app = mm.app({
         baseDir: 'apps/isSafeDomain',
-        plugin: 'security',
       });
-      this.app.ready(done);
+      return app.ready();
     });
-
-    afterEach(mm.restore);
     const domainWhiteList = [ '.domain.com', '*.alibaba.com', 'http://www.baidu.com', '192.*.0.*', 'foo.bar' ];
-    it('should return false when domains are not safe', function() {
-      this.app.httpRequest()
+    it('should return false when domains are not safe', async () => {
+      const res = await app.httpRequest()
         .get('/')
         .set('accept', 'text/html')
-        .expect(200)
-        .end(function(err, res) {
-          res.text.should.equal('false');
-        });
+        .expect(200);
+      assert(res.text === 'false');
     });
 
-    it('should return true when domains are safe', function() {
-      this.app.httpRequest()
+    it('should return true when domains are safe', async () => {
+      const res = await app.httpRequest()
         .get('/safe')
         .set('accept', 'text/html')
-        .expect(200)
-        .end(function(err, res) {
-          res.text.should.equal('true');
-        });
+        .expect(200);
+      assert(res.text === 'true');
     });
 
-    it('should return true', function() {
-      utils.isSafeDomain('domain.com', domainWhiteList).should.equal(true);
-      utils.isSafeDomain('.domain.com', domainWhiteList).should.equal(true);
-      utils.isSafeDomain('foo.domain.com', domainWhiteList).should.equal(true);
-      utils.isSafeDomain('.foo.domain.com', domainWhiteList).should.equal(true);
-      utils.isSafeDomain('.....domain.com', domainWhiteList).should.equal(true);
-      utils.isSafeDomain('okokok----.domain.com', domainWhiteList).should.equal(true);
+    it('should return true', () => {
+      assert(utils.isSafeDomain('domain.com', domainWhiteList) === true);
+      assert(utils.isSafeDomain('.domain.com', domainWhiteList) === true);
+      assert(utils.isSafeDomain('foo.domain.com', domainWhiteList) === true);
+      assert(utils.isSafeDomain('.foo.domain.com', domainWhiteList) === true);
+      assert(utils.isSafeDomain('.....domain.com', domainWhiteList) === true);
+      assert(utils.isSafeDomain('okokok----.domain.com', domainWhiteList) === true);
 
       // Wild Cast check
-      utils.isSafeDomain('www.alibaba.com', domainWhiteList).should.equal(true);
-      utils.isSafeDomain('www.tianmao.alibaba.com', domainWhiteList).should.equal(true);
-      utils.isSafeDomain('www.tianmao.AlIBAba.COm', domainWhiteList).should.equal(true);
-      utils.isSafeDomain('http://www.baidu.com', domainWhiteList).should.equal(true);
-      utils.isSafeDomain('192.168.0.255', domainWhiteList).should.equal(true);
-      utils.isSafeDomain('foo.bar', domainWhiteList).should.equal(true);
+      assert(utils.isSafeDomain('www.alibaba.com', domainWhiteList) === true);
+      assert(utils.isSafeDomain('www.tianmao.alibaba.com', domainWhiteList) === true);
+      assert(utils.isSafeDomain('www.tianmao.AlIBAba.COm', domainWhiteList) === true);
+      assert(utils.isSafeDomain('http://www.baidu.com', domainWhiteList) === true);
+      assert(utils.isSafeDomain('192.168.0.255', domainWhiteList) === true);
+      assert(utils.isSafeDomain('foo.bar', domainWhiteList) === true);
     });
 
-    it('should return false', function() {
-      utils.isSafeDomain('', domainWhiteList).should.equal(false);
-      utils.isSafeDomain(undefined, domainWhiteList).should.equal(false);
-      utils.isSafeDomain(null, domainWhiteList).should.equal(false);
-      utils.isSafeDomain(0, domainWhiteList).should.equal(false);
-      utils.isSafeDomain(1, domainWhiteList).should.equal(false);
-      utils.isSafeDomain({}, domainWhiteList).should.equal(false);
-      utils.isSafeDomain(function() {}, domainWhiteList).should.equal(false);
-      utils.isSafeDomain('aaa-domain.com', domainWhiteList).should.equal(false);
-      utils.isSafeDomain(' domain.com', domainWhiteList).should.equal(false);
-      utils.isSafeDomain('pwd---.-domain.com', domainWhiteList).should.equal(false);
-      utils.isSafeDomain('ok. domain.com', domainWhiteList).should.equal(false);
+    it('should return false', () => {
+      assert(utils.isSafeDomain('', domainWhiteList) === false);
+      assert(utils.isSafeDomain(undefined, domainWhiteList) === false);
+      assert(utils.isSafeDomain(null, domainWhiteList) === false);
+      assert(utils.isSafeDomain(0, domainWhiteList) === false);
+      assert(utils.isSafeDomain(1, domainWhiteList) === false);
+      assert(utils.isSafeDomain({}, domainWhiteList) === false);
+      assert(utils.isSafeDomain(function() {}, domainWhiteList) === false);
+      assert(utils.isSafeDomain('aaa-domain.com', domainWhiteList) === false);
+      assert(utils.isSafeDomain(' domain.com', domainWhiteList) === false);
+      assert(utils.isSafeDomain('pwd---.-domain.com', domainWhiteList) === false);
+      assert(utils.isSafeDomain('ok. domain.com', domainWhiteList) === false);
 
       // Wild Cast check
-      utils.isSafeDomain('www.alibaba.com.cn', domainWhiteList).should.equal(false);
-      utils.isSafeDomain('www.tianmao.alibab.com', domainWhiteList).should.equal(false);
-      utils.isSafeDomain('http://www.baidu.com/zh-CN', domainWhiteList).should.equal(false);
-      utils.isSafeDomain('192.168.1.255', domainWhiteList).should.equal(false);
-      utils.isSafeDomain('foofoo.bar', domainWhiteList).should.equal(false);
+      assert(utils.isSafeDomain('www.alibaba.com.cn', domainWhiteList) === false);
+      assert(utils.isSafeDomain('www.tianmao.alibab.com', domainWhiteList) === false);
+      assert(utils.isSafeDomain('http://www.baidu.com/zh-CN', domainWhiteList) === false);
+      assert(utils.isSafeDomain('192.168.1.255', domainWhiteList) === false);
+      assert(utils.isSafeDomain('foofoo.bar', domainWhiteList) === false);
     });
   });
 
-  describe('utils.checkIfIgnore', function() {
-    before(function* () {
-      this.app = mm.app({
+  describe('utils.checkIfIgnore', () => {
+    let app,
+      app2,
+      app3,
+      app4,
+      app5,
+      app6;
+    before(async () => {
+      app = mm.app({
         baseDir: 'apps/utils-check-if-pass',
         plugin: 'security',
       });
-      yield this.app.ready();
+      await app.ready();
 
-      this.app2 = mm.app({
+      app2 = mm.app({
         baseDir: 'apps/utils-check-if-pass2',
         plugin: 'security',
       });
-      yield this.app2.ready();
+      await app2.ready();
 
-      this.app3 = mm.app({
+      app3 = mm.app({
         baseDir: 'apps/utils-check-if-pass3',
         plugin: 'security',
       });
-      yield this.app3.ready();
+      await app3.ready();
 
-      this.app4 = mm.app({
+      app4 = mm.app({
         baseDir: 'apps/utils-check-if-pass4',
         plugin: 'security',
       });
-      yield this.app4.ready();
+      await app4.ready();
 
-      this.app5 = mm.app({
+      app5 = mm.app({
         baseDir: 'apps/utils-check-if-pass5',
         plugin: 'security',
       });
-      yield this.app5.ready();
+      await app5.ready();
 
-      this.app6 = mm.app({
+      app6 = mm.app({
         baseDir: 'apps/utils-check-if-pass6',
         plugin: 'security',
       });
-      yield this.app6.ready();
+      await app6.ready();
     });
 
-    afterEach(mm.restore);
-
-    it('should use match', function(done) {
-      this.app.httpRequest()
+    it('should use match', async () => {
+      const res = await app.httpRequest()
         .get('/match')
-        .expect(200, function(err, res) {
-          should.not.exist(err);
-          res.headers['x-csp-nonce'].length.should.equal(16);
-          done();
-        });
+        .expect(200);
+      assert(res.headers['x-csp-nonce'].length === 16);
     });
 
-    it('global match should not work', function(done) {
-      this.app.httpRequest()
+    it('global match should not work', async () => {
+      const res = await app.httpRequest()
         .get('/luckydrq')
-        .expect(200, function(err, res) {
-          should.not.exist(err);
-          res.headers['x-csp-nonce'].length.should.equal(16);
-          done();
-        });
+        .expect(200);
+      assert(res.headers['x-csp-nonce'].length === 16);
     });
 
-    it('own match should replace global match', function(done) {
-      const app2 = this.app2;
-      app2.httpRequest()
+    it('own match should replace global match', async () => {
+      let res = await app2.httpRequest()
         .get('/mymatch')
-        .expect(200, function(err, res) {
-          should.not.exist(err);
-          res.headers['x-csp-nonce'].length.should.equal(16);
-          app2.httpRequest()
-            .get('/match')
-            .expect(200, function(err, res) {
-              should.not.exist(err);
-              should.not.exist(res.headers['x-csp-nonce']);
-              done();
-            });
-        });
+        .expect(200);
+      assert(res.headers['x-csp-nonce'].length === 16);
+      res = await app2.httpRequest()
+        .get('/match')
+        .expect(200);
+      assert(!res.headers['x-csp-nonce']);
     });
 
-    it('own match has priority over own ignore', function(done) {
-      this.app2.httpRequest()
+    it('own match has priority over own ignore', async () => {
+      const res = await app2.httpRequest()
         .get('/mytrueignore')
-        .expect(200, function(err, res) {
-          should.not.exist(err);
-          should.not.exist(res.headers['x-csp-nonce']);
-          done();
-        });
+        .expect(200);
+      assert(!res.headers['x-csp-nonce']);
     });
 
-    it('should not use global ignore', function(done) {
-      this.app3.httpRequest()
+    it('should not use global ignore', async () => {
+      const res = await app3.httpRequest()
         .get('/ignore')
-        .expect(200, function(err, res) {
-          should.not.exist(err);
-          res.headers['x-csp-nonce'].length.should.equal(16);
-          done();
-        });
+        .expect(200);
+      assert(res.headers['x-csp-nonce'].length === 16);
     });
 
-    it('own ignore should replace global ignore', function(done) {
-      const app4 = this.app4;
-
-      app4.httpRequest()
+    it('own ignore should replace global ignore', async () => {
+      let res = await app4.httpRequest()
         .get('/ignore')
-        .expect(200, function(err, res) {
-          should.not.exist(err);
-          res.headers['x-csp-nonce'].length.should.equal(16);
-          app4.httpRequest()
-            .get('/myignore')
-            .expect(200, function(err, res) {
-              should.not.exist(err);
-              should.not.exist(res.headers['x-csp-nonce']);
-              done();
-            });
-        });
+        .expect(200);
+      assert(res.headers['x-csp-nonce'].length === 16);
+      res = await app4.httpRequest()
+        .get('/myignore')
+        .expect(200);
+      assert(!res.headers['x-csp-nonce']);
     });
 
-    it('should ignore array work', function(done) {
-      done = pedding(3, done);
-      const app5 = this.app5;
-
-      app5.httpRequest()
+    it('should ignore array work', async () => {
+      let res = await app5.httpRequest()
         .get('/ignore1')
-        .expect(200, function(err, res) {
-          res.should.not.have.header('X-Frame-Options');
-          should.not.exist(err);
-          done();
-        });
+        .expect(200);
+      assert(!res.headers['x-frame-options']);
 
-      app5.httpRequest()
+      res = await app5.httpRequest()
         .get('/ignore2')
-        .expect(200, function(err, res) {
-          res.should.not.have.header('X-Frame-Options');
-          should.not.exist(err);
-          done();
-        });
+        .expect(200);
+      assert(!res.headers['x-frame-options']);
 
-      app5.httpRequest()
+      res = await app5.httpRequest()
         .get('/')
-        .expect(200, function(err, res) {
-          res.should.have.header('X-Frame-Options');
-          should.not.exist(err);
-          done();
-        });
+        .expect(200);
+      assert(res.header['x-frame-options']);
     });
 
-    it('should match array work', function(done) {
-      done = pedding(3, done);
-      const app6 = this.app6;
-
-      app6.httpRequest()
+    it('should match array work', async () => {
+      let res = await app6.httpRequest()
         .get('/match1')
-        .expect(200, function(err, res) {
-          res.should.have.header('X-Frame-Options');
-          should.not.exist(err);
-          done();
-        });
+        .expect(200);
+      assert(res.headers['x-frame-options']);
 
-      app6.httpRequest()
+      res = await app6.httpRequest()
         .get('/match2')
-        .expect(200, function(err, res) {
-          res.should.have.header('X-Frame-Options');
-          should.not.exist(err);
-          done();
-        });
+        .expect(200);
+      assert(res.headers['x-frame-options']);
 
-      app6.httpRequest()
+      res = await app6.httpRequest()
         .get('/')
-        .expect(200, function(err, res) {
-          res.should.not.have.header('X-Frame-Options');
-          should.not.exist(err);
-          done();
-        });
+        .expect(200);
+      assert(!res.headers['x-frame-options']);
     });
   });
 });

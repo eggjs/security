@@ -1,6 +1,4 @@
-'use strict';
-
-const safeCurl = require('../../lib/extend/safe_curl');
+const { safeCurlForApplication } = require('../../lib/extend/safe_curl');
 
 const INPUT_CSRF = '\r\n<input type="hidden" name="_csrf" value="{{ctx.csrf}}" /></form>';
 
@@ -17,7 +15,7 @@ exports.injectCsrf = function injectCsrf(tmplStr) {
 };
 
 exports.injectNonce = function injectNonce(tmplStr) {
-  tmplStr = tmplStr.replace(/<script(.*?)>([\s\S]*?)<\/script>/gi, function replaceNonce(_, $1, $2) {
+  tmplStr = tmplStr.replace(/<script(.*?)>([\s\S]*?)<\/script[^>]*?>/gi, function replaceNonce(_, $1, $2) {
     if ($1.indexOf('nonce=') === -1) {
       $1 += ' nonce="{{ctx.nonce}}"';
     }
@@ -33,4 +31,4 @@ exports.injectHijackingDefense = function injectHijackingDefense(tmplStr) {
   return INJECTION_DEFENSE + tmplStr + INJECTION_DEFENSE;
 };
 
-exports.safeCurl = safeCurl;
+exports.safeCurl = safeCurlForApplication;

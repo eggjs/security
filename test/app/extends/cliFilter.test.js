@@ -1,35 +1,30 @@
-'use strict';
-
-require('should');
 const mm = require('egg-mock');
 
-describe('test/app/extends/cliFilter.test.js', function() {
-  before(function(done) {
-    this.app = mm.app({
+describe('test/app/extends/cliFilter.test.js', () => {
+  let app;
+  before(() => {
+    app = mm.app({
       baseDir: 'apps/helper-cliFilter-app',
       plugin: 'security',
     });
-    this.app.ready(done);
+    return app.ready();
   });
 
   after(mm.restore);
 
-
-  describe('helper.cliFilter()', function() {
-    it('should convert special chars in param and not convert chars in whitelists', function(done) {
-      this.app.httpRequest()
+  describe('helper.cliFilter()', () => {
+    it('should convert special chars in param and not convert chars in whitelists', () => {
+      return app.httpRequest()
         .get('/cliFilter')
         .expect(200)
-        .expect('true', done);
+        .expect('true');
     });
 
-    it('should not convert when chars in whitelists', function(done) {
-      this.app.httpRequest()
+    it('should not convert when chars in whitelists', () => {
+      return app.httpRequest()
         .get('/cliFilter-2')
         .expect(200)
-        .expect('true', done);
+        .expect('true');
     });
-
   });
-
 });

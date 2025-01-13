@@ -1,22 +1,19 @@
-'use strict';
-
-const pedding = require('pedding');
 const mm = require('egg-mock');
 
 describe('test/safe_redirect.test.js', function() {
-  let app,
-    app2;
-  before(function* () {
+  let app;
+  let app2;
+  before(async () => {
     app = mm.app({
       baseDir: 'apps/safe_redirect',
       plugin: 'security',
     });
-    yield app.ready();
+    await app.ready();
     app2 = mm.app({
       baseDir: 'apps/safe_redirect_noconfig',
       plugin: 'security',
     });
-    yield app2.ready();
+    await app2.ready();
   });
 
   afterEach(mm.restore);
@@ -26,39 +23,37 @@ describe('test/safe_redirect.test.js', function() {
     app.httpRequest()
       .get('/safe_redirect?goto=http://domain.com')
       .expect(302)
-      .expect('location', 'http://domain.com', done);
+      .expect('location', 'http://domain.com/', done);
   });
 
-  it('should redirect to / when white list is blank', function(done) {
-    done = pedding(2, done);
-    app2.httpRequest()
+  it('should redirect to / when white list is blank', async () => {
+    await app2.httpRequest()
       .get('/safe_redirect?goto=http://domain.com')
       .expect(302)
-      .expect('location', 'http://domain.com', done);
+      .expect('location', 'http://domain.com/');
 
-    app2.httpRequest()
+    await app2.httpRequest()
       .get('/safe_redirect?goto=http://baidu.com')
       .expect(302)
-      .expect('location', 'http://baidu.com', done);
+      .expect('location', 'http://baidu.com/');
   });
 
-  it('should redirect to / when url is invaild', function(done) {
+  it('should redirect to / when url is invaild', async () => {
     app.mm(process.env, 'NODE_ENV', 'production');
-    done = pedding(3, done);
-    app.httpRequest()
+    await app.httpRequest()
       .get('/safe_redirect?goto=http://baidu.com')
       .expect(302)
-      .expect('location', '/', done);
+      .expect('location', '/');
 
-    app.httpRequest()
+    await app.httpRequest()
       .get('/safe_redirect?goto=' + encodeURIComponent('http://domain.com.baidu.com/domain.com'))
       .expect(302)
-      .expect('location', '/', done);
+      .expect('location', '/');
 
-    app.httpRequest()
+    await app.httpRequest()
       .get('/safe_redirect?goto=https://x.yahoo.com')
       .expect(302)
-      .expect('location', '/', done);
+      .expect('location', '/');
   });
 
   it('should redirect to / when url is baidu.com', function(done) {
@@ -77,17 +72,16 @@ describe('test/safe_redirect.test.js', function() {
       .expect(500, done);
   });
 
-  it('should redirect path directly', function(done) {
-    done = pedding(2, done);
-    app.httpRequest()
+  it('should redirect path directly', async () => {
+    await app.httpRequest()
       .get('/safe_redirect?goto=/')
       .expect(302)
-      .expect('location', '/', done);
+      .expect('location', '/');
 
-    app.httpRequest()
+    await app.httpRequest()
       .get('/safe_redirect?goto=/foo/bar/')
       .expect(302)
-      .expect('location', '/foo/bar/', done);
+      .expect('location', '/foo/bar/');
   });
 
   describe('black and white urls', function() {
@@ -119,16 +113,14 @@ describe('test/safe_redirect.test.js', function() {
       'http://domain.com/foo/bar?a=123',
     ];
 
-    it('should block', function(done) {
+    it('should block', async () => {
       app.mm(process.env, 'NODE_ENV', 'production');
-      done = pedding(blackurls.length, done);
-
-      blackurls.forEach(function(url) {
-        app.httpRequest()
+      for (const url of blackurls) {
+        await app.httpRequest()
           .get('/safe_redirect?goto=' + encodeURIComponent(url))
           .expect('location', '/')
-          .expect(302, done);
-      });
+          .expect(302);
+      }
     });
 
     it('should block evil path', function() {
@@ -156,32 +148,28 @@ describe('test/safe_redirect.test.js', function() {
         .expect('location', '/', done);
     });
 
-    it('should pass', function(done) {
-      done = pedding(whiteurls.length, done);
-
-      whiteurls.forEach(function(url) {
-        app.httpRequest()
+    it('should pass', async () => {
+      for (const url of whiteurls) {
+        await app.httpRequest()
           .get('/safe_redirect?goto=' + encodeURIComponent(url))
           .expect('location', url)
-          .expect(302, done);
-      });
+          .expect(302);
+      }
     });
   });
 
   describe('unsafeRedirect()', function() {
-    it('should redirect to unsafe url', function(done) {
+    it('should redirect to unsafe url', async () => {
       const urls = [
         'http://baidu.com/',
         'http://xxx.oo.com/123.html',
       ];
-      done = pedding(urls.length, done);
-
-      urls.forEach(function(url) {
-        app.httpRequest()
+      for (const url of urls) {
+        await app.httpRequest()
           .get('/unsafe_redirect?goto=' + encodeURIComponent(url))
           .expect(302)
-          .expect('location', url, done);
-      });
+          .expect('location', url);
+      }
     });
   });
 });

@@ -1,36 +1,30 @@
-'use strict';
-
-require('should');
 const mm = require('egg-mock');
 
-describe('test/app/extends/escapeShellCmd.test.js', function() {
-  before(function(done) {
-    this.app = mm.app({
+describe('test/app/extends/escapeShellCmd.test.js', () => {
+  let app;
+  before(() => {
+    app = mm.app({
       baseDir: 'apps/helper-escapeShellCmd-app',
       plugin: 'security',
     });
-    this.app.ready(done);
+    return app.ready();
   });
 
   after(mm.restore);
 
-
-  describe('helper.escapeShellCmd()', function() {
-    it('should convert chars in blacklists', function(done) {
-      this.app.httpRequest()
+  describe('helper.escapeShellCmd()', () => {
+    it('should convert chars in blacklists', () => {
+      return app.httpRequest()
         .get('/escapeShellCmd')
         .expect(200)
-        .expect('true', done);
+        .expect('true');
     });
 
-    it('should not affect normal cmd', function(done) {
-      this.app.httpRequest()
+    it('should not affect normal cmd', () => {
+      return app.httpRequest()
         .get('/escapeShellCmd-2')
         .expect(200)
-        .expect('true', done);
+        .expect('true');
     });
-
-
   });
-
 });

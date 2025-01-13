@@ -1,10 +1,8 @@
-'use strict';
-
 module.exports = function(app) {
-  app.get('/', function* () {
+  app.get('/', async function() {
     this.body = '123';
   });
-  app.get('/nosub', function* () {
+  app.get('/nosub', async function() {
     this.securityOptions.hsts = {
       includeSubdomains: false,
     }

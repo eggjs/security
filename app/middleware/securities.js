@@ -1,8 +1,6 @@
-'use strict';
-
+const path = require('node:path');
+const assert = require('node:assert');
 const compose = require('koa-compose');
-const path = require('path');
-const assert = require('assert');
 const createMatch = require('egg-path-matching');
 
 module.exports = (_, app) => {
@@ -21,10 +19,13 @@ module.exports = (_, app) => {
   }
 
   defaultMiddleware.forEach(middlewareName => {
-
     middlewareName = middlewareName.trim();
 
     const opt = options[middlewareName];
+    if (opt === false) {
+      app.coreLogger.warn('[egg-security] Please use `config.security.%s = { enable: false }` instead of `config.security.%s = false`', middlewareName, middlewareName);
+    }
+
     assert(opt === false || typeof opt === 'object',
       `config.security.${middlewareName} must be an object, or false(if you turn it off)`);
 
