@@ -1,6 +1,8 @@
-const { normalize } = require('node:path');
-const IP = require('@eggjs/ip');
-const matcher = require('matcher');
+import { normalize } from 'node:path';
+import matcher from 'matcher';
+import { isV4Format, isV6Format, cidrSubnet } from '@eggjs/ip';
+import { Context } from '@eggjs/core';
+import { SecurityConfig } from '../types.js';
 
 /**
  * Check whether a domain is in the safe domain white list or not.
@@ -8,7 +10,7 @@ const matcher = require('matcher');
  * @param {Array<string>} whiteList The white list for domain.
  * @return {Boolean} If the `domain` is in the white list, return true; otherwise false.
  */
-exports.isSafeDomain = function isSafeDomain(domain, whiteList) {
+export function isSafeDomain(domain: string, whiteList: string[]): boolean {
   // domain must be string, otherwise return false
   if (typeof domain !== 'string') return false;
   // Ignore case sensitive first
@@ -29,9 +31,9 @@ exports.isSafeDomain = function isSafeDomain(domain, whiteList) {
     if (!/^\./.test(rule)) rule = `.${rule}`;
     return hostname.endsWith(rule);
   });
-};
+}
 
-exports.isSafePath = function isSafePath(path, ctx) {
+export function isSafePath(path: string, ctx: Context) {
   path = '.' + path;
   if (path.indexOf('%') !== -1) {
     try {
@@ -39,27 +41,30 @@ exports.isSafePath = function isSafePath(path, ctx) {
     } catch (e) {
       if (ctx.app.config.env === 'local' || ctx.app.config.env === 'unittest') {
         // not under production environment, output log
-        ctx.coreLogger.warn('[egg-security: dta global block] : decode file path %s failed.', path);
+        ctx.coreLogger.warn('[@eggjs/security: dta global block] : decode file path %j failed.', path);
       }
     }
   }
   const normalizePath = normalize(path);
   return !(normalizePath.startsWith('../') || normalizePath.startsWith('..\\'));
-};
+}
 
-exports.checkIfIgnore = function checkIfIgnore(opts, ctx) {
+export function checkIfIgnore(opts: any, ctx: Context) {
   // check opts.enable first
   if (!opts.enable) return true;
   return !opts.matching(ctx);
-};
+}
 
 const IP_RE = /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/;
-const topDomains = {};
-[ '.net.cn', '.gov.cn', '.org.cn', '.com.cn' ].forEach(function(item) {
+const topDomains: Record<string, number> = {};
+[
+  '.net.cn', '.gov.cn', '.org.cn', '.com.cn',
+].forEach(item => {
   topDomains[item] = 2 - item.split('.').length;
 });
 
-exports.getCookieDomain = function getCookieDomain(hostname) {
+export function getCookieDomain(hostname: string) {
+  // TODO(fengmk2): support ipv6
   if (IP_RE.test(hostname)) {
     return hostname;
   }
@@ -76,18 +81,21 @@ exports.getCookieDomain = function getCookieDomain(hostname) {
   }
   let domain = getDomain(splits, index);
   if (topDomains[domain]) {
+    // app.foo.org.cn => .foo.org.cn
     domain = getDomain(splits, index + topDomains[domain]);
   }
   return domain;
-};
-
-function getDomain(arr, index) {
-  return '.' + arr.slice(index).join('.');
 }
 
-exports.merge = function merge(origin, opts) {
-  if (!opts) return origin;
-  const res = {};
+function getDomain(splits: string[], index: number) {
+  return '.' + splits.slice(index).join('.');
+}
+
+export function merge(origin: Record<string, any>, opts?: Record<string, any>) {
+  if (!opts) {
+    return origin;
+  }
+  const res: Record<string, any> = {};
 
   const originKeys = Object.keys(origin);
   for (let i = 0; i < originKeys.length; i++) {
@@ -101,19 +109,19 @@ exports.merge = function merge(origin, opts) {
     res[key] = opts[key];
   }
   return res;
-};
+}
 
-exports.preprocessConfig = function(config) {
-  // transfor ssrf.ipBlackList to ssrf.checkAddress
+export function preprocessConfig(config: SecurityConfig) {
+  // transfer ssrf.ipBlackList to ssrf.checkAddress
   // ssrf.ipExceptionList can easily pick out unwanted ips from ipBlackList
   // checkAddress has higher priority than ipBlackList
   const ssrf = config.ssrf;
   if (ssrf && ssrf.ipBlackList && !ssrf.checkAddress) {
-    const containsList = ssrf.ipBlackList.map(getContains);
+    const blackList = ssrf.ipBlackList.map(getContains);
     const exceptionList = (ssrf.ipExceptionList || []).map(getContains);
     const hostnameExceptionList = ssrf.hostnameExceptionList;
-    ssrf.checkAddress = (ipAddresses, family, hostname) => {
-      // Check hostname first
+    ssrf.checkAddress = (ipAddresses, _family, hostname) => {
+      // Check white hostname first
       if (hostname && hostnameExceptionList) {
         if (hostnameExceptionList.includes(hostname)) {
           return true;
@@ -128,57 +136,72 @@ exports.preprocessConfig = function(config) {
         ipAddresses = [ ipAddresses ];
       }
       for (const ipAddress of ipAddresses) {
-        // FIXME: should support ipv6
-        if (ipAddress?.family === 6) continue;
-        const address = typeof ipAddress === 'string' ? ipAddress : ipAddress.address;
+        let address: string;
+        if (typeof ipAddress === 'string') {
+          address = ipAddress;
+        } else {
+          // FIXME: should support ipv6
+          if (ipAddress.family === 6) {
+            continue;
+          }
+          address = ipAddress.address;
+        }
+        // check white list first
         for (const exception of exceptionList) {
           if (exception(address)) {
             return true;
           }
         }
-        for (const contains of containsList) {
+        // check black list
+        for (const contains of blackList) {
           if (contains(address)) {
             return false;
           }
         }
       }
+      // default allow
       return true;
     };
   }
 
   // Make sure that `whiteList` or `protocolWhiteList` is case insensitive
   config.domainWhiteList = config.domainWhiteList || [];
-  config.domainWhiteList = config.domainWhiteList.map(domain => domain.toLowerCase());
+  config.domainWhiteList = config.domainWhiteList.map((domain: string) => domain.toLowerCase());
 
   config.protocolWhiteList = config.protocolWhiteList || [];
-  config.protocolWhiteList = config.protocolWhiteList.map(protocol => protocol.toLowerCase());
+  config.protocolWhiteList = config.protocolWhiteList.map((protocol: string) => protocol.toLowerCase());
 
   // Make sure refererWhiteList is case insensitive
   if (config.csrf && config.csrf.refererWhiteList) {
-    config.csrf.refererWhiteList = config.csrf.refererWhiteList.map(ref => ref.toLowerCase());
+    config.csrf.refererWhiteList = config.csrf.refererWhiteList.map((ref: string) => ref.toLowerCase());
   }
 
   // Directly converted to Set collection by a private property (not documented),
-  // And we NO LONGER need to do conversion in `foreach` again and again in `surl.js`.
-  config._protocolWhiteListSet = new Set(config.protocolWhiteList);
-  config._protocolWhiteListSet.add('http');
-  config._protocolWhiteListSet.add('https');
-  config._protocolWhiteListSet.add('file');
-  config._protocolWhiteListSet.add('data');
-};
+  // And we NO LONGER need to do conversion in `foreach` again and again in `lib/helper/surl.ts`.
+  const protocolWhiteListSet = new Set(config.protocolWhiteList);
+  protocolWhiteListSet.add('http');
+  protocolWhiteListSet.add('https');
+  protocolWhiteListSet.add('file');
+  protocolWhiteListSet.add('data');
 
-exports.getFromUrl = function(url, prop) {
+  Object.defineProperty(config, '__protocolWhiteListSet', {
+    value: protocolWhiteListSet,
+    enumerable: false,
+  });
+}
+
+export function getFromUrl(url: string, prop?: string) {
   try {
     const parsed = new URL(url);
-    return prop ? parsed[prop] : parsed;
-  } catch (err) {
+    return prop ? Reflect.get(parsed, prop) : parsed;
+  } catch {
     return null;
   }
-};
+}
 
-function getContains(ip) {
-  if (IP.isV4Format(ip) || IP.isV6Format(ip)) {
-    return _ip => ip === _ip;
+function getContains(ip: string) {
+  if (isV4Format(ip) || isV6Format(ip)) {
+    return (address: string) => address === ip;
   }
-  return IP.cidrSubnet(ip).contains;
+  return cidrSubnet(ip).contains;
 }

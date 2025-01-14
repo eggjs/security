@@ -1,27 +1,7 @@
-'use strict';
+import { SecurityConfig } from '../types.js';
 
-module.exports = () => {
-
-  const exports = {};
-
-  /**
-   * security options
-   * @member Config#security
-   * @property {String} defaultMiddleware - default open security middleware
-   * @property {Object} csrf - whether defend csrf attack
-   * @property {Object} xframe - whether enable X-Frame-Options response header, default SAMEORIGIN
-   * @property {Object} hsts - whether enable Strict-Transport-Security response header, default is one year
-   * @property {Object} methodnoallow - whether enable Http Method filter
-   * @property {Object} noopen - whether enable IE automaticlly download open
-   * @property {Object} nosniff -  whether enable IE8 automaticlly dedect mime
-   * @property {Object} xssProtection -  whether enable IE8 XSS Filter, default is open
-   * @property {Object} csp - content security policy config
-   * @property {Object} referrerPolicy - referrer policy config
-   * @property {Object} dta - auto avoid directory traversal attack
-   * @property {Array} domainWhiteList - domain white list
-   * @property {Array} protocolWhiteList - protocal white list
-   */
-  exports.security = {
+export default {
+  security: {
     domainWhiteList: [],
     protocolWhiteList: [],
     defaultMiddleware: 'csrf,hsts,methodnoallow,noopen,nosniff,csp,xssProtection,xframe,dta',
@@ -54,6 +34,8 @@ module.exports = () => {
       // csrf token's cookie options
       cookieOptions: {
         signed: false,
+        httpOnly: false,
+        overwrite: true,
       },
     },
 
@@ -101,17 +83,14 @@ module.exports = () => {
     },
 
     ssrf: {
-      ipBlackList: null,
-      ipExceptionList: null,
-      hostnameExceptionList: null,
-      checkAddress: null,
+      ipBlackList: undefined,
+      ipExceptionList: undefined,
+      hostnameExceptionList: undefined,
+      checkAddress: undefined,
     },
-  };
+  } as SecurityConfig,
 
-  exports.helper = {
-    shtml: {
-    },
-  };
-
-  return exports;
+  helper: {
+    shtml: {},
+  },
 };

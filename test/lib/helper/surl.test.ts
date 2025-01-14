@@ -1,9 +1,9 @@
-const { strict: assert } = require('node:assert');
-const mm = require('egg-mock');
+import { strict as assert } from 'node:assert';
+import { mm, MockApplication } from '@eggjs/mock';
 
-describe('test/lib/helper/surl.test.js', () => {
-  let app;
-  let app2;
+describe('test/lib/helper/surl.test.ts', () => {
+  let app: MockApplication;
+  let app2: MockApplication;
 
   before(async () => {
     app = mm.app({
@@ -12,7 +12,7 @@ describe('test/lib/helper/surl.test.js', () => {
     await app.ready();
   });
 
-  before(async function() {
+  before(async () => {
     app2 = mm.app({
       baseDir: 'apps/helper-app-surlextend',
     });
@@ -33,7 +33,8 @@ describe('test/lib/helper/surl.test.js', () => {
 
   it('should support white protocol', () => {
     const ctx = app.mockContext();
-    assert.equal(ctx.helper.surl('http://foo.com/javascript:alert(/XSS/)'), 'http://foo.com/javascript:alert(/XSS/)');
+    assert.equal(ctx.helper.surl('http://foo.com/javascript:alert(/XSS/)'),
+      'http://foo.com/javascript:alert(/XSS/)');
     assert.equal(ctx.helper.surl('https://foo.com/'), 'https://foo.com/');
     assert.equal(ctx.helper.surl('https://foo.com/>'), 'https://foo.com/&gt;');
     assert.equal(ctx.helper.surl('file://foo.com/'), 'file://foo.com/');

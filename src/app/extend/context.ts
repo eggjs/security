@@ -1,10 +1,16 @@
-'use strict';
+import { debuglog } from 'node:util';
+import { nanoid } from 'nanoid/non-secure';
+import Tokens from 'csrf';
+import { Context } from '@eggjs/core';
+import * as utils from '../../lib/utils.js';
+import type {
+  HttpClientRequestURL,
+  HttpClientOptions,
+  HttpClientRequestReturn,
+} from '../../lib/extend/safe_curl.js';
+import { SecurityConfig } from '../../types.js';
 
-const debug = require('node:util').debuglog('egg-security:context');
-const { nanoid } = require('nanoid/non-secure');
-const Tokens = require('csrf');
-const { safeCurlForContext } = require('../../lib/extend/safe_curl');
-const utils = require('../../lib/utils');
+const debug = debuglog('@eggjs/security/app/extend/context');
 
 const tokens = new Tokens();
 
@@ -18,7 +24,7 @@ const SECURITY_OPTIONS = Symbol('egg-security#SECURITY_OPTIONS');
 const CSRF_REFERER_CHECK = Symbol('egg-security#CSRF_REFERER_CHECK');
 const CSRF_CTOKEN_CHECK = Symbol('egg-security#CSRF_CTOKEN_CHECK');
 
-function findToken(obj, keys) {
+function findToken(obj: Record<string, string>, keys: string | string[]) {
   if (!obj) return;
   if (!keys || !keys.length) return;
   if (typeof keys === 'string') return obj[keys];
@@ -27,44 +33,42 @@ function findToken(obj, keys) {
   }
 }
 
-module.exports = {
+export default class SecurityContext extends Context {
   get securityOptions() {
     if (!this[SECURITY_OPTIONS]) {
       this[SECURITY_OPTIONS] = {};
     }
-    return this[SECURITY_OPTIONS];
-  },
+    return this[SECURITY_OPTIONS] as Partial<SecurityConfig>;
+  }
 
   /**
    * Check whether the specific `domain` is in / matches the whiteList or not.
    * @param {string} domain The assigned domain.
-   * @param {Array<string>} customWhiteList The custom white list for domain.
+   * @param {Array<string>} [customWhiteList] The custom white list for domain.
    * @return {boolean} If the domain is in / matches the whiteList, return true;
    * otherwise false.
    */
-  // TODO: add customWhiteList option document.
-  isSafeDomain(domain, customWhiteList) {
-    const domainWhiteList = customWhiteList && customWhiteList.length > 0 ? customWhiteList : this.app.config.security.domainWhiteList;
-    // const domainWhiteList = this.app.config.security.domainWhiteList;
+  isSafeDomain(domain: string, customWhiteList?: string[]): boolean {
+    const domainWhiteList =
+      customWhiteList && customWhiteList.length > 0 ? customWhiteList : this.app.config.security.domainWhiteList;
     return utils.isSafeDomain(domain, domainWhiteList);
-  },
+  }
 
   // Add nonce, random characters will be OK.
   // https://w3c.github.io/webappsec/specs/content-security-policy/#nonce_source
-
-  get nonce() {
+  get nonce(): string {
     if (!this[NONCE_CACHE]) {
       this[NONCE_CACHE] = nanoid(16);
     }
-    return this[NONCE_CACHE];
-  },
+    return this[NONCE_CACHE] as string;
+  }
 
   /**
    * get csrf token, general use in template
    * @return {String} csrf token
    * @public
    */
-  get csrf() {
+  get csrf(): string {
     // csrfSecret can be rotate, use NEW_CSRF_SECRET first
     const secret = this[NEW_CSRF_SECRET] || this[CSRF_SECRET];
     debug('get csrf token, NEW_CSRF_SECRET: %s, _CSRF_SECRET: %s', this[NEW_CSRF_SECRET], this[CSRF_SECRET]);
@@ -72,68 +76,88 @@ module.exports = {
     //  the token is not simply the secret;
     //  a random salt is prepended to the secret and used to scramble it.
     //  http://breachattack.com/
-    return secret ? tokens.create(secret) : '';
-  },
+    return secret ? tokens.create(secret as string) : '';
+  }
 
   /**
    * get csrf secret from session or cookie
    * @return {String} csrf secret
    * @private
    */
-  get [CSRF_SECRET]() {
-    if (this[_CSRF_SECRET]) return this[_CSRF_SECRET];
-    let { useSession, cookieName, sessionName, cookieOptions = {} } = this.app.config.security.csrf;
+  get [CSRF_SECRET](): string {
+    if (this[_CSRF_SECRET]) {
+      return this[_CSRF_SECRET] as string;
+    }
+    let {
+      useSession, sessionName,
+      cookieName: cookieNames,
+      cookieOptions,
+    } = this.app.config.security.csrf;
     // get secret from session or cookie
     if (useSession) {
-      this[_CSRF_SECRET] = this.session[sessionName] || '';
+      this[_CSRF_SECRET] = (this.session as any)[sessionName] || '';
     } else {
       // cookieName support array. so we can change csrf cookie name smoothly
-      if (!Array.isArray(cookieName)) cookieName = [ cookieName ];
-      for (const name of cookieName) {
-        this[_CSRF_SECRET] = this.cookies.get(name, { signed: cookieOptions.signed || false }) || '';
-        if (this[_CSRF_SECRET]) break;
+      if (!Array.isArray(cookieNames)) {
+        cookieNames = [ cookieNames ];
+      }
+      for (const cookieName of cookieNames) {
+        this[_CSRF_SECRET] = this.cookies.get(cookieName, { signed: cookieOptions.signed }) || '';
+        if (this[_CSRF_SECRET]) {
+          break;
+        }
       }
     }
-    return this[_CSRF_SECRET];
-  },
+    return this[_CSRF_SECRET] as string;
+  }
 
   /**
    * ensure csrf secret exists in session or cookie.
    * @param {Boolean} rotate reset secret even if the secret exists
    * @public
    */
-  ensureCsrfSecret(rotate) {
+  ensureCsrfSecret(rotate: boolean) {
     if (this[CSRF_SECRET] && !rotate) return;
     debug('ensure csrf secret, exists: %s, rotate; %s', this[CSRF_SECRET], rotate);
     const secret = tokens.secretSync();
     this[NEW_CSRF_SECRET] = secret;
-    let { useSession, sessionName, cookieDomain, cookieName, cookieOptions = {} } = this.app.config.security.csrf;
+    let {
+      useSession, sessionName,
+      cookieDomain,
+      cookieName: cookieNames,
+      cookieOptions,
+    } = this.app.config.security.csrf;
 
     if (useSession) {
-      this.session[sessionName] = secret;
+      // TODO(fengmk2): need to refactor egg-session plugin to support ctx.session type define
+      (this.session as any)[sessionName] = secret;
     } else {
-      const defaultOpts = {
-        domain: cookieDomain && cookieDomain(this),
-        signed: false,
-        httpOnly: false,
-        overwrite: true,
+      if (typeof cookieDomain === 'function') {
+        cookieDomain = cookieDomain(this);
+      }
+      const cookieOpts = {
+        domain: cookieDomain,
+        ...cookieOptions,
       };
-      const cookieOpts = utils.merge(defaultOpts, cookieOptions);
       // cookieName support array. so we can change csrf cookie name smoothly
-      if (!Array.isArray(cookieName)) cookieName = [ cookieName ];
-      for (const name of cookieName) {
-        this.cookies.set(name, secret, cookieOpts);
+      if (!Array.isArray(cookieNames)) {
+        cookieNames = [ cookieNames ];
+      }
+      for (const cookieName of cookieNames) {
+        this.cookies.set(cookieName, secret, cookieOpts);
       }
     }
-  },
+  }
 
   get [INPUT_TOKEN]() {
     const { headerName, bodyName, queryName } = this.app.config.security.csrf;
-    const token = findToken(this.query, queryName) || findToken(this.request.body, bodyName) ||
-      (headerName && this.get(headerName));
-    debug('get token %s, secret', token, this[CSRF_SECRET]);
+    // try order: query, body, header
+    const token = findToken(this.request.query, queryName)
+      || findToken(this.request.body, bodyName)
+      || (headerName && this.request.get(headerName));
+    debug('get token: %j, secret: %j', token, this[CSRF_SECRET]);
     return token;
-  },
+  }
 
   /**
    * rotate csrf secret exists in session or cookie.
@@ -144,7 +168,7 @@ module.exports = {
     if (!this[NEW_CSRF_SECRET] && this[CSRF_SECRET]) {
       this.ensureCsrfSecret(true);
     }
-  },
+  }
 
   /**
    * assert csrf token/referer is present
@@ -186,7 +210,7 @@ module.exports = {
       default:
         this.throw(`invalid type ${type}`);
     }
-  },
+  }
 
   [CSRF_CTOKEN_CHECK]() {
     if (!this[CSRF_SECRET]) {
@@ -206,7 +230,7 @@ module.exports = {
       }
       return 'invalid csrf token';
     }
-  },
+  }
 
   [CSRF_REFERER_CHECK]() {
     const { refererWhiteList } = this.app.config.security.csrf;
@@ -226,13 +250,28 @@ module.exports = {
       this[LOG_CSRF_NOTICE]('invalid csrf referer or origin');
       return 'invalid csrf referer or origin';
     }
-  },
+  }
 
-  [LOG_CSRF_NOTICE](msg) {
+  [LOG_CSRF_NOTICE](msg: string) {
     if (this.app.config.env === 'local') {
       this.logger.warn(`${msg}. See https://eggjs.org/zh-cn/core/security.html#安全威胁csrf的防范`);
     }
-  },
+  }
 
-  safeCurl: safeCurlForContext,
-};
+  async safeCurl(url: HttpClientRequestURL, options?: HttpClientOptions): HttpClientRequestReturn {
+    return await this.app.safeCurl(url, options);
+  }
+}
+
+declare module '@eggjs/core' {
+  interface Context {
+    get securityOptions(): Partial<SecurityConfig>;
+    isSafeDomain(domain: string, customWhiteList?: string[]): boolean;
+    get nonce(): string;
+    get csrf(): string;
+    ensureCsrfSecret(rotate: boolean): void;
+    rotateCsrfSecret(): void;
+    assertCsrf(): void;
+    safeCurl(url: HttpClientRequestURL, options?: HttpClientOptions): HttpClientRequestReturn;
+  }
+}

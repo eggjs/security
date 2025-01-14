@@ -1,8 +1,7 @@
-'use strict';
-
-const extend = require('extend');
-const platform = require('platform');
-const utils = require('../utils');
+import extend from 'extend2';
+import type { Context, Next } from '@eggjs/core';
+import * as utils from '../utils.js';
+import { SecurityConfig } from '../../types.js';
 
 const HEADER = [
   'x-content-security-policy',
@@ -13,28 +12,32 @@ const REPORT_ONLY_HEADER = [
   'content-security-policy-report-only',
 ];
 
-module.exports = options => {
-  return async function csp(ctx, next) {
+// Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)
+const MSIE_REGEXP = / MSIE /i;
+
+export default (options: SecurityConfig['csp']) => {
+  return async function csp(ctx: Context, next: Next) {
     await next();
 
-    const opts = utils.merge(options, ctx.securityOptions.csp);
+    const opts = {
+      ...options,
+      ...ctx.securityOptions.csp,
+    };
     if (utils.checkIfIgnore(opts, ctx)) return;
 
     let finalHeader;
     let value;
     const matchedOption = extend(true, {}, opts.policy);
-    const isIE = platform.parse(ctx.header['user-agent']).name === 'IE';
     const bufArray = [];
 
     const headers = opts.reportOnly ? REPORT_ONLY_HEADER : HEADER;
-    if (isIE && opts.supportIE) {
+    if (opts.supportIE && MSIE_REGEXP.test(ctx.get('user-agent'))) {
       finalHeader = headers[0];
     } else {
       finalHeader = headers[1];
     }
 
     for (const key in matchedOption) {
-
       value = matchedOption[key];
       value = Array.isArray(value) ? value : [ value ];
 
