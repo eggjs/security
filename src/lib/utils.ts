@@ -1,7 +1,8 @@
 import { normalize } from 'node:path';
 import matcher from 'matcher';
-import { isV4Format, isV6Format, cidrSubnet } from '@eggjs/ip';
+import * as IP from '@eggjs/ip';
 import { Context } from '@eggjs/core';
+import type { PathMatchingFun } from 'egg-path-matching';
 import { SecurityConfig } from '../types.js';
 
 /**
@@ -49,10 +50,10 @@ export function isSafePath(path: string, ctx: Context) {
   return !(normalizePath.startsWith('../') || normalizePath.startsWith('..\\'));
 }
 
-export function checkIfIgnore(opts: any, ctx: Context) {
+export function checkIfIgnore(opts: { enable: boolean; matching?: PathMatchingFun; }, ctx: Context) {
   // check opts.enable first
   if (!opts.enable) return true;
-  return !opts.matching(ctx);
+  return !opts.matching?.(ctx);
 }
 
 const IP_RE = /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/;
@@ -190,7 +191,7 @@ export function preprocessConfig(config: SecurityConfig) {
   });
 }
 
-export function getFromUrl(url: string, prop?: string) {
+export function getFromUrl(url: string, prop?: string): string | null {
   try {
     const parsed = new URL(url);
     return prop ? Reflect.get(parsed, prop) : parsed;
@@ -200,8 +201,8 @@ export function getFromUrl(url: string, prop?: string) {
 }
 
 function getContains(ip: string) {
-  if (isV4Format(ip) || isV6Format(ip)) {
+  if (IP.isV4Format(ip) || IP.isV6Format(ip)) {
     return (address: string) => address === ip;
   }
-  return cidrSubnet(ip).contains;
+  return IP.cidrSubnet(ip).contains;
 }

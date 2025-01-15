@@ -1,11 +1,10 @@
-'use strict';
-
 /**
  * File Inclusion
  */
 
-function pathFilter(path) {
+import type { BaseContextClass } from '@eggjs/core';
 
+export default function pathFilter(this: BaseContextClass, path: string) {
   if (typeof path !== 'string') return path;
 
   const pathSource = path;
@@ -16,7 +15,7 @@ function pathFilter(path) {
     } catch (e) {
       if (process.env.NODE_ENV !== 'production') {
         // Not a PROD env, logging with a warning.
-        this.ctx.coreLogger.warn('[egg-security:helper:spath] : decode file path %s failed.', path);
+        this.ctx.coreLogger.warn('[@eggjs/security/lib/helper/spath] : decode file path %j failed.', path);
       }
       break;
     }
@@ -26,5 +25,3 @@ function pathFilter(path) {
   }
   return pathSource;
 }
-
-module.exports = pathFilter;

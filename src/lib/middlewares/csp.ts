@@ -1,7 +1,7 @@
-import extend from 'extend2';
+import { extend } from 'extend2';
 import type { Context, Next } from '@eggjs/core';
 import * as utils from '../utils.js';
-import { SecurityConfig } from '../../types.js';
+import type { SecurityConfig } from '../../types.js';
 
 const HEADER = [
   'x-content-security-policy',

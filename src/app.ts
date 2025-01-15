@@ -2,7 +2,7 @@ import assert from 'node:assert';
 import type { ILifecycleBoot, EggCore } from '@eggjs/core';
 import { preprocessConfig } from './lib/utils.js';
 
-export class AgentBoot implements ILifecycleBoot {
+export default class AgentBoot implements ILifecycleBoot {
   private readonly app;
 
   constructor(app: EggCore) {

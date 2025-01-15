@@ -8,7 +8,7 @@ import type {
   HttpClientOptions,
   HttpClientRequestReturn,
 } from '../../lib/extend/safe_curl.js';
-import { SecurityConfig } from '../../types.js';
+import { SecurityConfig, SecurityHelperConfig } from '../../types.js';
 
 const debug = debuglog('@eggjs/security/app/extend/context');
 
@@ -113,10 +113,10 @@ export default class SecurityContext extends Context {
 
   /**
    * ensure csrf secret exists in session or cookie.
-   * @param {Boolean} rotate reset secret even if the secret exists
+   * @param {Boolean} [rotate] reset secret even if the secret exists
    * @public
    */
-  ensureCsrfSecret(rotate: boolean) {
+  ensureCsrfSecret(rotate?: boolean) {
     if (this[CSRF_SECRET] && !rotate) return;
     debug('ensure csrf secret, exists: %s, rotate; %s', this[CSRF_SECRET], rotate);
     const secret = tokens.secretSync();
@@ -154,7 +154,7 @@ export default class SecurityContext extends Context {
     // try order: query, body, header
     const token = findToken(this.request.query, queryName)
       || findToken(this.request.body, bodyName)
-      || (headerName && this.request.get(headerName));
+      || (headerName && this.request.get<string>(headerName));
     debug('get token: %j, secret: %j', token, this[CSRF_SECRET]);
     return token;
   }
@@ -265,11 +265,11 @@ export default class SecurityContext extends Context {
 
 declare module '@eggjs/core' {
   interface Context {
-    get securityOptions(): Partial<SecurityConfig>;
+    get securityOptions(): Partial<SecurityConfig & SecurityHelperConfig>;
     isSafeDomain(domain: string, customWhiteList?: string[]): boolean;
     get nonce(): string;
     get csrf(): string;
-    ensureCsrfSecret(rotate: boolean): void;
+    ensureCsrfSecret(rotate?: boolean): void;
     rotateCsrfSecret(): void;
     assertCsrf(): void;
     safeCurl(url: HttpClientRequestURL, options?: HttpClientOptions): HttpClientRequestReturn;

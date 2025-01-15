@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Escape JavaScript to \xHH format
  */
@@ -13,15 +11,14 @@ const MATCH_VULNERABLE_REGEXP = /[\x00-\x2f\x3a-\x40\x5b-\x60\x7b-\x7f]/;
 
 const BASIC_ALPHABETS = new Set('abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split(''));
 
-const map = {
+const map: Record<string, string> = {
   '\t': '\\t',
   '\n': '\\n',
   '\r': '\\r',
 };
 
-function escapeJavaScript(string) {
-
-  const str = '' + string;
+export default function escapeJavaScript(text: string) {
+  const str = '' + text;
   const match = MATCH_VULNERABLE_REGEXP.exec(str);
 
   if (!match) {
@@ -57,7 +54,4 @@ function escapeJavaScript(string) {
   }
 
   return lastIndex !== index ? res + str.substring(lastIndex, index) : res;
-
 }
-
-module.exports = escapeJavaScript;

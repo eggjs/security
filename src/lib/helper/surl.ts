@@ -1,14 +1,16 @@
-const escapeMap = {
+import type { BaseContextClass } from '@eggjs/core';
+
+const escapeMap: Record<string, string> = {
   '"': '&quot;',
   '<': '&lt;',
   '>': '&gt;',
   '\'': '&#x27;',
 };
 
-export function surl(val) {
+export default function surl(this: BaseContextClass, val: string) {
   // Just get the converted the protocolWhiteList in `Set` mode,
   // Avoid conversions in `foreach`
-  const protocolWhiteListSet = this.app.config.security.__protocolWhiteListSet;
+  const protocolWhiteListSet = this.app.config.security.__protocolWhiteListSet!;
 
   if (typeof val !== 'string') {
     return val;

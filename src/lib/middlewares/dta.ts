@@ -1,10 +1,9 @@
-'use strict';
+import type { Context, Next } from '@eggjs/core';
+import { isSafePath } from '../utils.js';
 
 // https://en.wikipedia.org/wiki/Directory_traversal_attack
-const isSafePath = require('../utils').isSafePath;
-
-module.exports = () => {
-  return function dta(ctx, next) {
+export default () => {
+  return function dta(ctx: Context, next: Next) {
     const path = ctx.path;
     if (!isSafePath(path, ctx)) {
       ctx.throw(400);

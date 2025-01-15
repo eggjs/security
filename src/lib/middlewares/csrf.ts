@@ -1,10 +1,14 @@
-const debug = require('node:util').debuglog('egg-security:csrf');
-const typeis = require('type-is');
-const utils = require('../utils');
+import { debuglog } from 'node:util';
+import type { Context, Next } from '@eggjs/core';
+import typeis from 'type-is';
+import { checkIfIgnore } from '../utils.js';
+import type { SecurityConfig } from '../../types.js';
 
-module.exports = options => {
-  return function csrf(ctx, next) {
-    if (utils.checkIfIgnore(options, ctx)) {
+const debug = debuglog('@eggjs/security/lib/middlewares/csrf');
+
+export default (options: SecurityConfig['csrf']) => {
+  return function csrf(ctx: Context, next: Next) {
+    if (checkIfIgnore(options, ctx)) {
       return next();
     }
 
@@ -32,7 +36,7 @@ module.exports = options => {
       return next();
     }
 
-    const body = ctx.request.body || {};
+    const body = ctx.request.body;
     debug('%s %s, got %j', ctx.method, ctx.url, body);
     ctx.assertCsrf();
     return next();

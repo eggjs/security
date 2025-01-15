@@ -222,8 +222,16 @@ export interface SecurityConfig {
     enable: boolean;
     // https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP#csp_overview
     policy: Record<string, string | string[]>;
-    reportOnly: boolean;
-    supportIE: boolean;
+    /**
+     * whether enable report only mode
+     * Default to `undefined`
+     */
+    reportOnly?: boolean;
+    /**
+     * whether support IE
+     * Default to `undefined`
+     */
+    supportIE?: boolean;
     // reportUri: string;
     // hashAlgorithm: string;
     // reportHandler: (ctx: any, reportUri: string, policy: string, violatedDirective: string, originalPolicy: string, isReportOnly: boolean) => void;
@@ -260,11 +268,41 @@ export interface SecurityConfig {
     hostnameExceptionList?: string[];
     checkAddress?: SSRFCheckAddressFunction;
   };
+
+  match?: string | RegExp;
+  ignore?: string | RegExp;
+
+  /**
+   * @private
+   */
+  readonly __protocolWhiteListSet?: Set<string>;
+}
+
+export type SecurityHelperOnTagAttrHandler = (
+  tag: string, name: string, value: string, isWhiteAttr: boolean) => string | void;
+
+export interface SecurityHelperConfig {
+  shtml: {
+    /**
+     * tag attribute white list
+     */
+    whiteList?: Record<string, string[]>;
+    /**
+     * domain white list
+     * @deprecated use `config.security.domainWhiteList` instead
+     */
+    domainWhiteList?: string[];
+    /**
+     * tag attribute handler
+     */
+    onTagAttr?: SecurityHelperOnTagAttrHandler;
+  };
 }
 
 declare module '@eggjs/core' {
   // add EggAppConfig overrides types
   interface EggAppConfig {
     security: SecurityConfig;
+    helper: SecurityHelperConfig;
   }
 }

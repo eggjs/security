@@ -1,8 +1,11 @@
 import { Response as KoaResponse } from '@eggjs/core';
+import SecurityContext from './context.js';
 
 const unsafeRedirect = KoaResponse.prototype.redirect;
 
 export default class SecurityResponse extends KoaResponse {
+  declare ctx: SecurityContext;
+
   /**
    * This is an unsafe redirection, and we WON'T check if the
    * destination url is safe or not.
@@ -84,5 +87,6 @@ declare module '@eggjs/core' {
   // add Response overrides types
   interface Response {
     unsafeRedirect(url: string, alt?: string): void;
+    redirect(url: string, alt?: string): void;
   }
 }

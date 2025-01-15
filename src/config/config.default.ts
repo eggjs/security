@@ -1,4 +1,4 @@
-import { SecurityConfig } from '../types.js';
+import { SecurityConfig, SecurityHelperConfig } from '../types.js';
 
 export default {
   security: {
@@ -92,5 +92,5 @@ export default {
 
   helper: {
     shtml: {},
-  },
+  } as SecurityHelperConfig,
 };

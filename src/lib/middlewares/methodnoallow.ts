@@ -1,10 +1,10 @@
-'use strict';
+import { METHODS } from 'node:http';
+import type { Context, Next } from '@eggjs/core';
 
-const methods = require('methods');
 const METHODS_NOT_ALLOWED = [ 'trace', 'track' ];
-const safeHttpMethodsMap = {};
+const safeHttpMethodsMap: Record<string, boolean> = {};
 
-for (const method of methods) {
+for (const method of METHODS) {
   if (!METHODS_NOT_ALLOWED.includes(method)) {
     safeHttpMethodsMap[method.toUpperCase()] = true;
   }
@@ -12,8 +12,8 @@ for (const method of methods) {
 
 // https://www.owasp.org/index.php/Cross_Site_Tracing
 // http://jsperf.com/find-by-map-with-find-by-array
-module.exports = () => {
-  return function notAllow(ctx, next) {
+export default () => {
+  return function notAllow(ctx: Context, next: Next) {
     // ctx.method is upper case
     if (!safeHttpMethodsMap[ctx.method]) {
       ctx.throw(405);

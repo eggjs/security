@@ -1,11 +1,7 @@
-'use strict';
-
-
 const BASIC_ALPHABETS = new Set('#&;`|*?~<>^()[]{}$;\'",\x0A\xFF'.split(''));
 
-function escapeShellCmd(string) {
-
-  const str = '' + string;
+export default function escapeShellCmd(text: string) {
+  const str = '' + text;
   let res = '';
   let ascii;
 
@@ -18,4 +14,3 @@ function escapeShellCmd(string) {
 
   return res;
 }
-module.exports = escapeShellCmd;

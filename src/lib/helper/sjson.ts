@@ -1,19 +1,18 @@
-'use strict';
-
-const sjs = require('./sjs');
+import sjs from './sjs.js';
 
 /**
  * escape json
  * for output json in script
  */
 
-function sanitizeKey(obj) {
+function sanitizeKey(obj: any) {
   if (typeof obj !== 'object') return obj;
   if (Array.isArray(obj)) return obj;
   if (obj === null) return null;
-  if (obj instanceof Boolean) return obj;
-  if (obj instanceof Number) return obj;
-  if (obj instanceof Buffer) return obj.toString();
+  if (typeof obj === 'boolean') return obj;
+  if (typeof obj === 'number') return obj;
+  if (Buffer.isBuffer(obj)) return obj.toString();
+
   for (const k in obj) {
     const escapedK = sjs(k);
     if (escapedK !== k) {
@@ -26,13 +25,11 @@ function sanitizeKey(obj) {
   return obj;
 }
 
-function jsonEscape(obj) {
-  return JSON.stringify(sanitizeKey(obj), function(k, v) {
+export default function jsonEscape(obj: any) {
+  return JSON.stringify(sanitizeKey(obj), (_k, v) => {
     if (typeof v === 'string') {
       return sjs(v);
     }
     return v;
   });
 }
-
-module.exports = jsonEscape;

@@ -1,14 +1,11 @@
-'use strict';
-
 /**
  * remote command execution
  */
 
 const BASIC_ALPHABETS = new Set('abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ.-_'.split(''));
 
-function cliFilter(string) {
-
-  const str = '' + string;
+export default function cliFilter(text: string) {
+  const str = '' + text;
   let res = '';
   let ascii;
 
@@ -20,6 +17,4 @@ function cliFilter(string) {
   }
 
   return res;
-
 }
-module.exports = cliFilter;

@@ -1,6 +1,7 @@
-'use strict';
+import type { Context, Next } from '@eggjs/core';
+import { checkIfIgnore } from '../utils.js';
+import type { SecurityConfig } from '../../types.js';
 
-const utils = require('../utils');
 // https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/Referrer-Policy
 const ALLOWED_POLICIES_ENUM = [
   'no-referrer',
@@ -14,12 +15,16 @@ const ALLOWED_POLICIES_ENUM = [
   '',
 ];
 
-module.exports = options => {
-  return async function referrerPolicy(ctx, next) {
+export default (options: SecurityConfig['referrerPolicy']) => {
+  return async function referrerPolicy(ctx: Context, next: Next) {
     await next();
 
-    const opts = utils.merge(options, ctx.securityOptions.refererPolicy);
-    if (utils.checkIfIgnore(opts, ctx)) { return; }
+    const opts = {
+      ...options,
+      ...ctx.securityOptions.referrerPolicy,
+    };
+    if (checkIfIgnore(opts, ctx)) return;
+
     const policy = opts.value;
     if (!ALLOWED_POLICIES_ENUM.includes(policy)) {
       throw new Error('"' + policy + '" is not available."');
