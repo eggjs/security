@@ -1,14 +1,15 @@
-const mm = require('egg-mock');
+import { mm, MockApplication } from '@eggjs/mock';
 
-describe('test/app/extends/spath.test.js', () => {
-  let app;
+describe('test/app/extends/spath.test.ts', () => {
+  let app: MockApplication;
   before(() => {
     app = mm.app({
       baseDir: 'apps/helper-spath-app',
-      plugin: 'security',
     });
     return app.ready();
   });
+
+  after(() => app.close());
 
   after(mm.restore);
 

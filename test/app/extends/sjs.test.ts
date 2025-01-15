@@ -1,16 +1,17 @@
-const mm = require('egg-mock');
+import { mm, MockApplication } from '@eggjs/mock';
 
-describe('test/app/extends/sjs.test.js', () => {
-  let app;
+describe('test/app/extends/sjs.test.ts', () => {
+  let app: MockApplication;
   before(() => {
     app = mm.app({
       baseDir: 'apps/helper-sjs-app',
-      plugin: 'security',
     });
     return app.ready();
   });
 
-  after(mm.restore);
+  after(() => app.close());
+
+  afterEach(mm.restore);
 
   describe('helper.sjs()', () => {
     it('should convert special chars on js context and not convert chart in whitelists', () => {

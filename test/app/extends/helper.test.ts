@@ -1,31 +1,34 @@
-const { strict: assert } = require('node:assert');
-const mm = require('egg-mock');
+import { strict as assert } from 'node:assert';
+import { mm, MockApplication } from '@eggjs/mock';
 
-describe('test/app/extends/helper.test.js', () => {
-  let app;
-  let app2;
-  let app3;
+describe('test/app/extends/helper.test.ts', () => {
+  let app: MockApplication;
+  let app2: MockApplication;
+  let app3: MockApplication;
   before(async () => {
     app = mm.app({
       baseDir: 'apps/helper-app',
-      plugin: 'security',
     });
     await app.ready();
 
     app2 = mm.app({
       baseDir: 'apps/helper-config-app',
-      plugin: 'security',
     });
     await app2.ready();
 
     app3 = mm.app({
       baseDir: 'apps/helper-link-app',
-      plugin: 'security',
     });
     await app3.ready();
   });
 
-  after(mm.restore);
+  after(async () => {
+    await app.close();
+    await app2.close();
+    await app3.close();
+  });
+
+  afterEach(mm.restore);
 
   describe('helper.escape()', () => {
     it('should work', () => {

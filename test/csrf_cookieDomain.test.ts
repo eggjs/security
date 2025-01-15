@@ -1,12 +1,10 @@
-'use strict';
+import { mm, MockApplication } from '@eggjs/mock';
 
-const mm = require('egg-mock');
-
-describe('test/csrf_cookieDomain.test.js', () => {
+describe('test/csrf_cookieDomain.test.ts', () => {
   afterEach(mm.restore);
 
   describe('cookieDomain = function', () => {
-    let app;
+    let app: MockApplication;
     before(() => {
       app = mm.app({
         baseDir: 'apps/ctoken',
@@ -26,7 +24,7 @@ describe('test/csrf_cookieDomain.test.js', () => {
   });
 
   describe('cookieDomain = string', () => {
-    let app;
+    let app: MockApplication;
     before(() => {
       app = mm.app({
         baseDir: 'apps/csrf-string-cookiedomain',
@@ -46,7 +44,7 @@ describe('test/csrf_cookieDomain.test.js', () => {
   });
 
   describe('cookieOptions = object', () => {
-    let app;
+    let app: MockApplication;
     before(() => {
       app = mm.app({
         baseDir: 'apps/csrf-cookieOptions',
@@ -66,7 +64,7 @@ describe('test/csrf_cookieDomain.test.js', () => {
   });
 
   describe('cookieOptions use signed', () => {
-    let app;
+    let app: MockApplication;
     before(() => {
       app = mm.app({
         baseDir: 'apps/csrf-cookieOptions-signed',

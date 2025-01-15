@@ -1,10 +1,11 @@
-const { strict: assert } = require('node:assert');
-const mm = require('egg-mock');
+import { strict as assert } from 'node:assert';
+import { mm, MockApplication } from '@eggjs/mock';
 
-describe('test/context.test.js', () => {
+describe('test/context.test.ts', () => {
   afterEach(mm.restore);
+
   describe('context.isSafeDomain', () => {
-    let app;
+    let app: MockApplication;
     before(() => {
       app = mm.app({
         baseDir: 'apps/isSafeDomain-custom',
@@ -12,12 +13,14 @@ describe('test/context.test.js', () => {
       return app.ready();
     });
 
+    after(() => app.close());
+
     it('should return false when domains are not safe', async () => {
       const res = await app.httpRequest()
         .get('/unsafe')
         .set('accept', 'text/html')
         .expect(200);
-      assert(res.text === 'false');
+      assert.equal(res.text, 'false');
     });
 
     it('should return true when domains are safe', async () => {
@@ -25,7 +28,7 @@ describe('test/context.test.js', () => {
         .get('/safe')
         .set('accept', 'text/html')
         .expect(200);
-      assert(res.text === 'true');
+      assert.equal(res.text, 'true');
     });
   });
 });

@@ -1,16 +1,17 @@
-const mm = require('egg-mock');
+import { mm, MockApplication } from '@eggjs/mock';
 
-describe('test/app/extends/sjson.test.js', () => {
-  let app;
+describe('test/app/extends/sjson.test.ts', () => {
+  let app: MockApplication;
   before(() => {
     app = mm.app({
       baseDir: 'apps/helper-sjson-app',
-      plugin: 'security',
     });
     return app.ready();
   });
 
-  after(mm.restore);
+  after(() => app.close());
+
+  afterEach(mm.restore);
 
   describe('helper.sjson()', () => {
     it('should not convert json string when json is safe', () => {

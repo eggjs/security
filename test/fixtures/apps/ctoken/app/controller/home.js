@@ -1,8 +1,6 @@
-'use strict';
-
 module.exports = app => {
   return class Home extends app.Controller {
-    * index() {
+    async index() {
       this.ctx.body = 'hello ctoken';
     }
   };

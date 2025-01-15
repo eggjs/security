@@ -1,14 +1,15 @@
-const mm = require('egg-mock');
+import { mm, MockApplication } from '@eggjs/mock';
 
-describe('test/app/extends/cliFilter.test.js', () => {
-  let app;
+describe('test/app/extends/cliFilter.test.ts', () => {
+  let app: MockApplication;
   before(() => {
     app = mm.app({
       baseDir: 'apps/helper-cliFilter-app',
-      plugin: 'security',
     });
     return app.ready();
   });
+
+  after(() => app.close());
 
   after(mm.restore);
 
