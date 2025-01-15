@@ -1,32 +1,35 @@
-const { strict: assert } = require('node:assert');
-const mm = require('egg-mock');
+import { strict as assert } from 'node:assert';
+import { mm, MockApplication } from '@eggjs/mock';
 
-describe('test/csp.test.js', () => {
-  let app;
-  let app2;
-  let app3;
-  let app4;
+describe('test/csp.test.ts', () => {
+  let app: MockApplication;
+  let app2: MockApplication;
+  let app3: MockApplication;
+  let app4: MockApplication;
   before(async () => {
     app = mm.app({
       baseDir: 'apps/csp',
-      plugin: 'security',
     });
     await app.ready();
     app2 = mm.app({
       baseDir: 'apps/csp-ignore',
-      plugin: 'security',
     });
     await app2.ready();
     app3 = mm.app({
       baseDir: 'apps/csp-reportonly',
-      plugin: 'security',
     });
     await app3.ready();
     app4 = mm.app({
       baseDir: 'apps/csp-supportie',
-      plugin: 'security',
     });
     await app4.ready();
+  });
+
+  after(async () => {
+    await app.close();
+    await app2.close();
+    await app3.close();
+    await app4.close();
   });
 
   afterEach(mm.restore);
@@ -84,9 +87,8 @@ describe('test/csp.test.js', () => {
       const nonce = res.text;
       const header = res.headers['content-security-policy'];
       const re_nonce = /nonce-([^']+)/;
-      header.match(re_nonce, function(_, match) {
-        assert.equal(nonce, match);
-      });
+      const m = re_nonce.exec(header);
+      assert.equal(nonce, m![1], header);
     });
 
     it('should have X-CSP-Nonce header', async () => {

@@ -1,6 +1,6 @@
-import { extend } from 'extend2';
+import extend from 'extend';
 import type { Context, Next } from '@eggjs/core';
-import * as utils from '../utils.js';
+import { checkIfIgnore } from '../utils.js';
 import type { SecurityConfig } from '../../types.js';
 
 const HEADER = [
@@ -23,10 +23,9 @@ export default (options: SecurityConfig['csp']) => {
       ...options,
       ...ctx.securityOptions.csp,
     };
-    if (utils.checkIfIgnore(opts, ctx)) return;
+    if (checkIfIgnore(opts, ctx)) return;
 
     let finalHeader;
-    let value;
     const matchedOption = extend(true, {}, opts.policy);
     const bufArray = [];
 
@@ -38,30 +37,30 @@ export default (options: SecurityConfig['csp']) => {
     }
 
     for (const key in matchedOption) {
-      value = matchedOption[key];
-      value = Array.isArray(value) ? value : [ value ];
-
+      const value = matchedOption[key];
       // Other arrays are splitted into strings EXCEPT `sandbox`
-      if (key === 'sandbox' && value[0] === true) {
+      // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/sandbox
+      if (key === 'sandbox' && value === true) {
         bufArray.push(key);
       } else {
+        let values = (Array.isArray(value) ? value : [ value ]) as string[];
         if (key === 'script-src') {
-          const hasNonce = value.some(function(val) {
+          const hasNonce = values.some(function(val) {
             return val.indexOf('nonce-') !== -1;
           });
 
           if (!hasNonce) {
-            value.push('\'nonce-' + ctx.nonce + '\'');
+            values.push('\'nonce-' + ctx.nonce + '\'');
           }
         }
 
-        value = value.map(function(d) {
+        values = values.map(function(d) {
           if (d.startsWith('.')) {
             d = '*' + d;
           }
           return d;
         });
-        bufArray.push(key + ' ' + value.join(' '));
+        bufArray.push(key + ' ' + values.join(' '));
       }
     }
     const headerString = bufArray.join(';');

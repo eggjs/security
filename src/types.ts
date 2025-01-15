@@ -221,7 +221,7 @@ export interface SecurityConfig {
      */
     enable: boolean;
     // https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP#csp_overview
-    policy: Record<string, string | string[]>;
+    policy: Record<string, string | string[] | boolean>;
     /**
      * whether enable report only mode
      * Default to `undefined`
