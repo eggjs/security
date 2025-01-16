@@ -3,11 +3,14 @@ import compose from 'koa-compose';
 import { pathMatching } from 'egg-path-matching';
 import { EggCore, MiddlewareFunc } from '@eggjs/core';
 import securityMiddlewares from '../../lib/middlewares/index.js';
+import type { SecurityMiddlewareName } from '../../config/config.default.js';
 
 export default (_: unknown, app: EggCore) => {
   const options = app.config.security;
   const middlewares: MiddlewareFunc[] = [];
-  const defaultMiddleware = options.defaultMiddleware.split(',').map(m => m.trim()).filter(m => !!m);
+  const defaultMiddlewares = typeof options.defaultMiddleware === 'string'
+    ? options.defaultMiddleware.split(',').map(m => m.trim()).filter(m => !!m) as SecurityMiddlewareName[]
+    : options.defaultMiddleware;
 
   if (options.match || options.ignore) {
     app.coreLogger.warn('[@eggjs/security/middleware/securities] Please set `match` or `ignore` on sub config');
@@ -19,8 +22,8 @@ export default (_: unknown, app: EggCore) => {
     options.csrf.cookieDomain = () => originalCookieDomain;
   }
 
-  defaultMiddleware.forEach(middlewareName => {
-    const opt = Reflect.get(options, middlewareName);
+  defaultMiddlewares.forEach(middlewareName => {
+    const opt = Reflect.get(options, middlewareName) as any;
     if (opt === false) {
       app.coreLogger.warn('[egg-security] Please use `config.security.%s = { enable: false }` instead of `config.security.%s = false`', middlewareName, middlewareName);
     }
@@ -49,10 +52,7 @@ export default (_: unknown, app: EggCore) => {
     opt.matching = pathMatching(opt);
 
     const createMiddleware = securityMiddlewares[middlewareName];
-    if (!createMiddleware) {
-      throw new TypeError(`[@eggjs/security/middleware/securities] Can't find middleware ${middlewareName}`);
-    }
-    const fn = createMiddleware(opt, app);
+    const fn = createMiddleware(opt);
     middlewares.push(fn);
     app.coreLogger.info('[@eggjs/security/middleware/securities] use %s middleware', middlewareName);
   });

@@ -1,5 +1,5 @@
 import { EggCore } from '@eggjs/core';
-import { SSRFCheckAddressFunction } from '../../types.js';
+import type { SSRFCheckAddressFunction } from '../../types.js';
 
 const SSRF_HTTPCLIENT = Symbol('SSRF_HTTPCLIENT');
 

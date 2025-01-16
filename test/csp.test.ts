@@ -1,5 +1,6 @@
 import { strict as assert } from 'node:assert';
 import { mm, MockApplication } from '@eggjs/mock';
+import snapshot from 'snap-shot-it';
 
 describe('test/csp.test.ts', () => {
   let app: MockApplication;
@@ -101,6 +102,7 @@ describe('test/csp.test.ts', () => {
   });
 
   it('should ignore path', async () => {
+    snapshot(app2.config.security);
     const res = await app2.httpRequest()
       .get('/api/update')
       .expect(200);

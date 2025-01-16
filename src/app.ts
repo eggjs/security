@@ -1,6 +1,7 @@
 import assert from 'node:assert';
 import type { ILifecycleBoot, EggCore } from '@eggjs/core';
 import { preprocessConfig } from './lib/utils.js';
+import { SecurityConfig } from './config/config.default.js';
 
 export default class AgentBoot implements ILifecycleBoot {
   private readonly app;
@@ -24,6 +25,8 @@ export default class AgentBoot implements ILifecycleBoot {
         '[@eggjs/security/ap] `config.security.csrf.type` must be one of ' + legalTypes.join(', '));
     }
 
+    // parse config and check if config is legal
+    app.config.security = SecurityConfig.parse(app.config.security);
     preprocessConfig(app.config.security);
   }
 }

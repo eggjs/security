@@ -46,7 +46,8 @@
     "matcher": "^4.0.0",
     "nanoid": "^3.3.8",
     "type-is": "^1.6.18",
-    "xss": "^1.0.3"
+    "xss": "^1.0.3",
+    "zod": "^3.24.1"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.17.1",
@@ -66,6 +67,7 @@
     "eslint": "8",
     "eslint-config-egg": "14",
     "rimraf": "6",
+    "snap-shot-it": "^7.9.10",
     "spy": "^1.0.0",
     "supertest": "^6.3.3",
     "tshy": "3",

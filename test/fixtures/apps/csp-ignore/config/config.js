@@ -6,7 +6,7 @@ exports.security = {
   defaultMiddleware: 'csp',
   csp:{
     enable: true,
-    ignore:'/api/',
+    ignore: '/api/',
     policy:{
         'script-src': [
           '\'self\'',

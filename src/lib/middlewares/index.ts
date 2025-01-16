@@ -1,4 +1,3 @@
-import { EggCore, MiddlewareFunc } from '@eggjs/core';
 import csp from './csp.js';
 import csrf from './csrf.js';
 import dta from './dta.js';
@@ -21,4 +20,4 @@ export default {
   referrerPolicy,
   xframe,
   xssProtection,
-} as Record<string, (options: unknown, app: EggCore) => MiddlewareFunc>;
+};
