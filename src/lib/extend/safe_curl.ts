@@ -16,25 +16,23 @@ export type HttpClientRequestReturn = ReturnType<HttpClient['prototype']['reques
  * @return {Promise} response
  */
 export async function safeCurlForApplication(this: EggCore, url: HttpClientRequestURL, options: HttpClientOptions = {}): HttpClientRequestReturn {
-  // eslint-disable-next-line @typescript-eslint/no-this-alias
-  const app = this;
-  const ssrfConfig = app.config.security.ssrf;
+  const ssrfConfig = this.config.security.ssrf;
   if (ssrfConfig?.checkAddress) {
     options.checkAddress = ssrfConfig.checkAddress;
   } else {
-    app.logger.warn('[@eggjs/security] please configure `config.security.ssrf` first');
+    this.logger.warn('[@eggjs/security] please configure `config.security.ssrf` first');
   }
 
   if (ssrfConfig?.checkAddress) {
-    let httpClient = app[SSRF_HTTPCLIENT] as ReturnType<EggCore['createHttpClient']>;
+    let httpClient = this[SSRF_HTTPCLIENT] as ReturnType<EggCore['createHttpClient']>;
     // use the new httpClient init with checkAddress
     if (!httpClient) {
-      httpClient = app[SSRF_HTTPCLIENT] = app.createHttpClient({
+      httpClient = this[SSRF_HTTPCLIENT] = this.createHttpClient({
         checkAddress: ssrfConfig.checkAddress,
       });
     }
     return await httpClient.request(url, options);
   }
 
-  return await app.curl(url, options);
+  return await this.curl(url, options);
 }

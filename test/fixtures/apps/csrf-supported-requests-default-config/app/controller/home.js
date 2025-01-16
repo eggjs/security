@@ -1,10 +1,8 @@
-'use strict';
-
 exports.index = ctx => {
   ctx.body = {
     csrf: ctx.csrf,
     env: ctx.app.config.env,
-    supportedRequests: ctx.app.config.security.csrf.supportedRequests,
+    supportedRequestsMethods: ctx.app.config.security.csrf.supportedRequests[0].methods,
   };
 };
 

@@ -38,7 +38,7 @@ export type SecurityMiddlewareName = z.infer<typeof SecurityMiddlewareName>;
 /**
  * (ctx) => boolean
  */
-const IgnoreOrMatchHandler = z.function().args(z.string()).returns(z.boolean());
+const IgnoreOrMatchHandler = z.function().args(z.any()).returns(z.boolean());
 export type IgnoreOrMatchHandler = z.infer<typeof IgnoreOrMatchHandler>;
 
 const IgnoreOrMatch = z.union([
@@ -76,7 +76,13 @@ export const SecurityConfig = z.object({
   /**
    * whether defend csrf attack
    */
-  csrf: z.object({
+  csrf: z.preprocess(val => {
+    // transform old config, `csrf: false` to `csrf: { enable: false }`
+    if (typeof val === 'boolean') {
+      return { enable: val };
+    }
+    return val;
+  }, z.object({
     match: IgnoreOrMatchOption,
     ignore: IgnoreOrMatchOption,
     /**
@@ -183,7 +189,7 @@ export const SecurityConfig = z.object({
       httpOnly: false,
       overwrite: true,
     }),
-  }).default({}),
+  }).default({})),
   /**
    * whether enable X-Frame-Options response header
    */

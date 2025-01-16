@@ -53,6 +53,7 @@
     "@arethetypeswrong/cli": "^0.17.1",
     "@eggjs/bin": "7",
     "@eggjs/mock": "^6.0.5",
+    "@eggjs/supertest": "^8.1.1",
     "@eggjs/tsconfig": "1",
     "@types/escape-html": "^1.0.4",
     "@types/extend": "^3.0.4",
