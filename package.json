@@ -78,6 +78,7 @@
     "lint": "eslint --cache src test --ext .ts",
     "pretest": "npm run clean && npm run lint -- --fix",
     "test": "egg-bin test",
+    "test:snapshot:update": "SNAPSHOT_UPDATE=1 egg-bin test",
     "preci": "npm run clean &&  npm run lint",
     "ci": "egg-bin cov",
     "postci": "npm run prepublishOnly && npm run clean",

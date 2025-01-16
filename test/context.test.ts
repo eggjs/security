@@ -1,5 +1,6 @@
 import { strict as assert } from 'node:assert';
 import { mm, MockApplication } from '@eggjs/mock';
+import snapshot from 'snap-shot-it';
 
 describe('test/context.test.ts', () => {
   afterEach(mm.restore);
@@ -16,6 +17,7 @@ describe('test/context.test.ts', () => {
     after(() => app.close());
 
     it('should return false when domains are not safe', async () => {
+      snapshot(app.config.security);
       const res = await app.httpRequest()
         .get('/unsafe')
         .set('accept', 'text/html')

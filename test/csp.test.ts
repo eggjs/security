@@ -109,6 +109,12 @@ describe('test/csp.test.ts', () => {
     assert.equal(res.headers['x-csp-nonce'], undefined);
   });
 
+  it('should ignore path by regex rule', async () => {
+    const res = await app2.httpRequest()
+      .get('/ignore/update')
+      .expect(200);
+    assert.equal(res.headers['x-csp-nonce'], undefined);
+  });
 
   it('should not ignore path when do not match', async () => {
     const res = await app2.httpRequest()

@@ -1,7 +1,12 @@
-exports['test/csp.test.ts should ignore path 1'] = {
-  "domainWhiteList": [],
+exports['test/context.test.ts context.isSafeDomain should return false when domains are not safe 1'] = {
+  "domainWhiteList": [
+    ".domain.com",
+    "http://www.baidu.com",
+    "192.*.0.*",
+    "*.alibaba.com"
+  ],
   "protocolWhiteList": [],
-  "defaultMiddleware": "csp",
+  "defaultMiddleware": "xframe",
   "csrf": {
     "enable": true,
     "type": "ctoken",
@@ -55,32 +60,8 @@ exports['test/csp.test.ts should ignore path 1'] = {
     "value": "1; mode=block"
   },
   "csp": {
-    "ignore": [
-      "/api/",
-      {}
-    ],
-    "enable": true,
-    "policy": {
-      "script-src": [
-        "'self'",
-        "'unsafe-inline'",
-        "'unsafe-eval'",
-        "www.google-analytics.com"
-      ],
-      "style-src": [
-        "'unsafe-inline'",
-        "www.google-analytics.com"
-      ],
-      "img-src": [
-        "'self'",
-        "data:",
-        "www.google-analytics.com"
-      ],
-      "frame-ancestors": [
-        "'self'"
-      ],
-      "report-uri": "http://pointman.domain.com/csp?app=csp"
-    }
+    "enable": false,
+    "policy": {}
   },
   "referrerPolicy": {
     "enable": false,

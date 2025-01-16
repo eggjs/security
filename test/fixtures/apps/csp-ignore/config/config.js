@@ -1,12 +1,10 @@
-'use strict';
-
 exports.keys = 'test key';
 
 exports.security = {
   defaultMiddleware: 'csp',
   csp:{
     enable: true,
-    ignore: '/api/',
+    ignore: [ '/api/', /^\/ignore\// ],
     policy:{
         'script-src': [
           '\'self\'',
