@@ -18,12 +18,8 @@ export default class AgentBoot implements ILifecycleBoot {
     if (app.config.security.csrf.enable) {
       const { ignoreJSON } = app.config.security.csrf;
       if (ignoreJSON) {
-        app.deprecate('[@eggjs/security/app] `app.config.security.csrf.ignoreJSON` is not safe now, please disable it.');
+        app.deprecate('[@eggjs/security/app] `config.security.csrf.ignoreJSON` is not safe now, please disable it.');
       }
-
-      // const legalTypes = [ 'all', 'referer', 'ctoken', 'any' ];
-      // assert(legalTypes.includes(type),
-      //   '[@eggjs/security/ap] `config.security.csrf.type` must be one of ' + legalTypes.join(', '));
     }
 
     preprocessConfig(app.config.security);
