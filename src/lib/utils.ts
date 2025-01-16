@@ -36,7 +36,7 @@ export function isSafeDomain(domain: string, whiteList: string[]): boolean {
 
 export function isSafePath(path: string, ctx: Context) {
   path = '.' + path;
-  if (path.indexOf('%') !== -1) {
+  if (path.includes('%')) {
     try {
       path = decodeURIComponent(path);
     } catch (e) {
