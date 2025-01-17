@@ -5,7 +5,7 @@ module.exports = function(app) {
   app.get('/referrer', function() {
     const policy = this.query.policy;
     this.body = '123';
-    this.securityOptions.referrerPolicy = {
+    this.securityOptions.refererPolicy = {
       enable: true,
       value: policy
     }

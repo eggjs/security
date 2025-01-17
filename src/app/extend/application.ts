@@ -1,5 +1,10 @@
 import { EggCore } from '@eggjs/core';
-import { safeCurlForApplication } from '../../lib/extend/safe_curl.js';
+import {
+  safeCurlForApplication,
+  type HttpClientRequestURL,
+  type HttpClientOptions,
+  type HttpClientResponse,
+} from '../../lib/extend/safe_curl.js';
 
 const INPUT_CSRF = '\r\n<input type="hidden" name="_csrf" value="{{ctx.csrf}}" /></form>';
 const INJECTION_DEFENSE = '<!--for injection--><!--</html>--><!--for injection-->';
@@ -30,7 +35,10 @@ export default class SecurityApplication extends EggCore {
     return INJECTION_DEFENSE + html + INJECTION_DEFENSE;
   }
 
-  safeCurl = safeCurlForApplication;
+  async safeCurl<T = any>(
+    url: HttpClientRequestURL, options?: HttpClientOptions): Promise<HttpClientResponse<T>> {
+    return await safeCurlForApplication<T>(this, url, options);
+  }
 }
 
 declare module '@eggjs/core' {
@@ -38,6 +46,6 @@ declare module '@eggjs/core' {
     injectCsrf(html: string): string;
     injectNonce(html: string): string;
     injectHijackingDefense(html: string): string;
-    safeCurl: typeof safeCurlForApplication;
+    safeCurl<T = any>(url: HttpClientRequestURL, options?: HttpClientOptions): Promise<HttpClientResponse<T>>;
   }
 }

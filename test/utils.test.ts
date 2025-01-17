@@ -1,18 +1,23 @@
-const { strict: assert } = require('node:assert');
-const mm = require('egg-mock');
-const { utils } = require('..');
+import { strict as assert } from 'node:assert';
+import { mm, MockApplication } from '@eggjs/mock';
+import * as utils from '../src/lib/utils.js';
 
-describe('test/utils.test.js', () => {
+describe('test/utils.test.ts', () => {
   afterEach(mm.restore);
   describe('utils.isSafeDomain', () => {
-    let app;
+    let app: MockApplication;
     before(() => {
       app = mm.app({
         baseDir: 'apps/isSafeDomain',
       });
       return app.ready();
     });
-    const domainWhiteList = [ '.domain.com', '*.alibaba.com', 'http://www.baidu.com', '192.*.0.*', 'foo.bar' ];
+
+    after(() => app.close());
+
+    const domainWhiteList = [
+      '.domain.com', '*.alibaba.com', 'http://www.baidu.com', '192.*.0.*', 'foo.bar',
+    ];
     it('should return false when domains are not safe', async () => {
       const res = await app.httpRequest()
         .get('/')
@@ -48,12 +53,12 @@ describe('test/utils.test.js', () => {
 
     it('should return false', () => {
       assert(utils.isSafeDomain('', domainWhiteList) === false);
-      assert(utils.isSafeDomain(undefined, domainWhiteList) === false);
-      assert(utils.isSafeDomain(null, domainWhiteList) === false);
-      assert(utils.isSafeDomain(0, domainWhiteList) === false);
-      assert(utils.isSafeDomain(1, domainWhiteList) === false);
-      assert(utils.isSafeDomain({}, domainWhiteList) === false);
-      assert(utils.isSafeDomain(function() {}, domainWhiteList) === false);
+      assert((utils as any).isSafeDomain(undefined, domainWhiteList) === false);
+      assert((utils as any).isSafeDomain(null, domainWhiteList) === false);
+      assert((utils as any).isSafeDomain(0, domainWhiteList) === false);
+      assert((utils as any).isSafeDomain(1, domainWhiteList) === false);
+      assert((utils as any).isSafeDomain({}, domainWhiteList) === false);
+      assert((utils as any).isSafeDomain(function() {}, domainWhiteList) === false);
       assert(utils.isSafeDomain('aaa-domain.com', domainWhiteList) === false);
       assert(utils.isSafeDomain(' domain.com', domainWhiteList) === false);
       assert(utils.isSafeDomain('pwd---.-domain.com', domainWhiteList) === false);
@@ -69,48 +74,51 @@ describe('test/utils.test.js', () => {
   });
 
   describe('utils.checkIfIgnore', () => {
-    let app,
-      app2,
-      app3,
-      app4,
-      app5,
-      app6;
+    let app: MockApplication;
+    let app2: MockApplication;
+    let app3: MockApplication;
+    let app4: MockApplication;
+    let app5: MockApplication;
+    let app6: MockApplication;
     before(async () => {
       app = mm.app({
         baseDir: 'apps/utils-check-if-pass',
-        plugin: 'security',
       });
       await app.ready();
 
       app2 = mm.app({
         baseDir: 'apps/utils-check-if-pass2',
-        plugin: 'security',
       });
       await app2.ready();
 
       app3 = mm.app({
         baseDir: 'apps/utils-check-if-pass3',
-        plugin: 'security',
       });
       await app3.ready();
 
       app4 = mm.app({
         baseDir: 'apps/utils-check-if-pass4',
-        plugin: 'security',
       });
       await app4.ready();
 
       app5 = mm.app({
         baseDir: 'apps/utils-check-if-pass5',
-        plugin: 'security',
       });
       await app5.ready();
 
       app6 = mm.app({
         baseDir: 'apps/utils-check-if-pass6',
-        plugin: 'security',
       });
       await app6.ready();
+    });
+
+    after(async () => {
+      await app.close();
+      await app2.close();
+      await app3.close();
+      await app4.close();
+      await app5.close();
+      await app6.close();
     });
 
     it('should use match', async () => {

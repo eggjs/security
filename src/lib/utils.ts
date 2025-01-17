@@ -1,6 +1,6 @@
 import { normalize } from 'node:path';
 import matcher from 'matcher';
-import * as IP from '@eggjs/ip';
+import IP from '@eggjs/ip';
 import { Context } from '@eggjs/core';
 import type { PathMatchingFun } from 'egg-path-matching';
 import { SecurityConfig } from '../types.js';

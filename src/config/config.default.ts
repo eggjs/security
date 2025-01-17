@@ -1,4 +1,5 @@
 import z from 'zod';
+import { Context } from '@eggjs/core';
 
 const CSRFSupportRequestItem = z.object({
   path: z.instanceof(RegExp),
@@ -38,7 +39,7 @@ export type SecurityMiddlewareName = z.infer<typeof SecurityMiddlewareName>;
 /**
  * (ctx) => boolean
  */
-const IgnoreOrMatchHandler = z.function().args(z.any()).returns(z.boolean());
+const IgnoreOrMatchHandler = z.function().args(z.instanceof(Context)).returns(z.boolean());
 export type IgnoreOrMatchHandler = z.infer<typeof IgnoreOrMatchHandler>;
 
 const IgnoreOrMatch = z.union([
@@ -154,7 +155,7 @@ export const SecurityConfig = z.object({
     cookieDomain: z.union([
       z.string(),
       z.function()
-        .args(z.any())
+        .args(z.instanceof(Context))
         .returns(z.string()),
     ]).optional(),
     /**
@@ -278,7 +279,7 @@ export const SecurityConfig = z.object({
      *
      * Default to `'1; mode=block'`
      */
-    value: z.string().default('1; mode=block'),
+    value: z.coerce.string().default('1; mode=block'),
   }).default({}),
   /**
    * content security policy config

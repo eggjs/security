@@ -1,30 +1,33 @@
-const { strict: assert } = require('node:assert');
-const mm = require('egg-mock');
+import { strict as assert } from 'node:assert';
+import { mm, MockApplication } from '@eggjs/mock';
 
-describe('test/hsts.test.js', () => {
-  let app;
-  let app2;
-  let app3;
+describe('test/hsts.test.ts', () => {
+  let app: MockApplication;
+  let app2: MockApplication;
+  let app3: MockApplication;
   describe('server', () => {
     before(async () => {
       app = mm.app({
         baseDir: 'apps/hsts',
-        plugin: 'security',
       });
       await app.ready();
       app2 = mm.app({
         baseDir: 'apps/hsts-nosub',
-        plugin: 'security',
       });
       await app2.ready();
       app3 = mm.app({
         baseDir: 'apps/hsts-default',
-        plugin: 'security',
       });
       await app3.ready();
     });
 
     afterEach(mm.restore);
+
+    after(async () => {
+      await app.close();
+      await app2.close();
+      await app3.close();
+    });
 
     it('should contain not Strict-Transport-Security header with default', async () => {
       const res = await app3.httpRequest()

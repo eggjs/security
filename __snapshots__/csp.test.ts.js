@@ -55,10 +55,6 @@ exports['test/csp.test.ts should ignore path 1'] = {
     "value": "1; mode=block"
   },
   "csp": {
-    "ignore": [
-      "/api/",
-      {}
-    ],
     "enable": true,
     "policy": {
       "script-src": [
@@ -80,7 +76,11 @@ exports['test/csp.test.ts should ignore path 1'] = {
         "'self'"
       ],
       "report-uri": "http://pointman.domain.com/csp?app=csp"
-    }
+    },
+    "ignore": [
+      "/api/",
+      {}
+    ]
   },
   "referrerPolicy": {
     "enable": false,

@@ -1,7 +1,7 @@
 import { METHODS } from 'node:http';
 import type { Context, Next } from '@eggjs/core';
 
-const METHODS_NOT_ALLOWED = [ 'trace', 'track' ];
+const METHODS_NOT_ALLOWED = [ 'TRACE', 'TRACK' ];
 const safeHttpMethodsMap: Record<string, boolean> = {};
 
 for (const method of METHODS) {

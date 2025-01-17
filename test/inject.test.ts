@@ -1,15 +1,16 @@
-const { strict: assert } = require('node:assert');
-const mm = require('egg-mock');
+import { strict as assert } from 'node:assert';
+import { mm, MockApplication } from '@eggjs/mock';
 
-describe('test/inject.test.js', () => {
-  let app;
+describe('test/inject.test.ts', () => {
+  let app: MockApplication;
   before(() => {
     app = mm.app({
       baseDir: 'apps/inject',
-      plugin: 'security',
     });
     return app.ready();
   });
+
+  after(() => app.close());
 
   afterEach(mm.restore);
 
@@ -73,7 +74,7 @@ describe('test/inject.test.js', () => {
       const header = res.headers['content-security-policy'];
       const csrf = res.headers['x-csrf'];
       const re_nonce = /nonce-([^']+)/;
-      const nonce = header.match(re_nonce)[1];
+      const nonce = header.match(re_nonce)![1];
       assert(body.includes(nonce));
       assert(body.includes(csrf));
     });

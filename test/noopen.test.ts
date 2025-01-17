@@ -1,15 +1,16 @@
-const { strict: assert } = require('node:assert');
-const mm = require('egg-mock');
+import { strict as assert } from 'node:assert';
+import { mm, MockApplication } from '@eggjs/mock';
 
-describe('test/noopen.test.js', () => {
-  let app;
+describe('test/noopen.test.ts', () => {
+  let app: MockApplication;
   before(() => {
     app = mm.app({
       baseDir: 'apps/noopen',
-      plugin: 'security',
     });
     return app.ready();
   });
+
+  after(() => app.close());
 
   afterEach(mm.restore);
 

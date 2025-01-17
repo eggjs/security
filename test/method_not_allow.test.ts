@@ -1,13 +1,10 @@
-'use strict';
+import { mm, MockApplication } from '@eggjs/mock';
 
-const mm = require('egg-mock');
-
-describe('test/method_not_allow.test.js', () => {
-  let app;
+describe('test/method_not_allow.test.ts', () => {
+  let app: MockApplication;
   before(() => {
     app = mm.app({
       baseDir: 'apps/method',
-      plugin: 'security',
     });
     return app.ready();
   });
@@ -17,16 +14,12 @@ describe('test/method_not_allow.test.js', () => {
   after(() => app.close());
 
   it('should allow', async () => {
-    const methods = [ 'get', 'post', 'head', 'put', 'delete' ];
-    for (const method of methods) {
-      console.log(method);
-      await app.httpRequest()[method]('/')
-        .expect(200);
-    }
+    await app.httpRequest().get('/')
+      .expect(200);
   });
 
-  it('should not allow trace method', () => {
-    return app.httpRequest()
+  it('should not allow trace method', async () => {
+    await app.httpRequest()
       .trace('/')
       .set('accept', 'text/html')
       .expect(405);

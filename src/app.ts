@@ -13,7 +13,11 @@ export default class AgentBoot implements ILifecycleBoot {
     const app = this.app;
     app.config.coreMiddleware.push('securities');
     // parse config and check if config is legal
-    app.config.security = SecurityConfig.parse(app.config.security);
+    const parsed = SecurityConfig.parse(app.config.security);
+    if (typeof app.config.security.csrf === 'boolean') {
+      // support old config: `config.security.csrf = false`
+      app.config.security.csrf = parsed.csrf;
+    }
 
     if (app.config.security.csrf.enable) {
       const { ignoreJSON } = app.config.security.csrf;

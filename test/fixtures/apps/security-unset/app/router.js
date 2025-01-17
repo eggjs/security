@@ -1,10 +1,8 @@
-'use strict';
-
 module.exports = function(app) {
-  app.get('/', function *(){
+  app.get('/', function(){
     this.body = this.isSafeDomain('aaa-domain.com');
   });
-  app.get('/safe', function *(){
+  app.get('/safe', function(){
     this.body = this.isSafeDomain('www.domain.com');
   });
 };

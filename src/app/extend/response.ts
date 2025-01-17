@@ -20,7 +20,9 @@ export default class SecurityResponse extends KoaResponse {
    * ctx.unsafeRedirect('http://www.domain.com');
    * ```
    */
-  unsafeRedirect = unsafeRedirect;
+  unsafeRedirect(url: string, alt?: string) {
+    unsafeRedirect.call(this, url, alt);
+  }
 
   // app.response.unsafeRedirect = app.response.redirect;
   // delegate(app.context, 'response').method('unsafeRedirect');
@@ -48,7 +50,8 @@ export default class SecurityResponse extends KoaResponse {
 
     // if begin with '/', it means an internal jump
     if (url[0] === '/' && url[1] !== '\\') {
-      return this.unsafeRedirect(url, alt);
+      this.unsafeRedirect(url, alt);
+      return;
     }
 
     let urlObject: URL;

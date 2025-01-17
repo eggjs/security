@@ -21,6 +21,10 @@ export default (options: SecurityConfig['referrerPolicy']) => {
 
     const opts = {
       ...options,
+      // check refererPolicy for backward compatibility
+      // typo on the old version
+      // @see https://github.com/eggjs/security/blob/e3408408adec5f8d009d37f75126ed082481d0ac/lib/middlewares/referrerPolicy.js#L21C59-L21C72
+      ...(ctx.securityOptions as any).refererPolicy,
       ...ctx.securityOptions.referrerPolicy,
     };
     if (checkIfIgnore(opts, ctx)) return;

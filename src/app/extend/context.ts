@@ -6,7 +6,7 @@ import * as utils from '../../lib/utils.js';
 import type {
   HttpClientRequestURL,
   HttpClientOptions,
-  HttpClientRequestReturn,
+  HttpClientResponse,
 } from '../../lib/extend/safe_curl.js';
 import { SecurityConfig, SecurityHelperConfig } from '../../types.js';
 
@@ -258,8 +258,13 @@ export default class SecurityContext extends Context {
     }
   }
 
-  async safeCurl(url: HttpClientRequestURL, options?: HttpClientOptions): HttpClientRequestReturn {
-    return await this.app.safeCurl(url, options);
+  async safeCurl<T = any>(
+    url: HttpClientRequestURL, options?: HttpClientOptions): Promise<HttpClientResponse<T>> {
+    return await this.app.safeCurl<T>(url, options);
+  }
+
+  unsafeRedirect(url: string, alt?: string) {
+    this.response.unsafeRedirect(url, alt);
   }
 }
 
@@ -272,6 +277,6 @@ declare module '@eggjs/core' {
     ensureCsrfSecret(rotate?: boolean): void;
     rotateCsrfSecret(): void;
     assertCsrf(): void;
-    safeCurl(url: HttpClientRequestURL, options?: HttpClientOptions): HttpClientRequestReturn;
+    safeCurl<T = any>(url: HttpClientRequestURL, options?: HttpClientOptions): Promise<HttpClientResponse<T>>;
   }
 }

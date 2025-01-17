@@ -1,8 +1,4 @@
 exports['test/csrf.test.ts should update form with csrf token 1'] = {
-  "ignore": [
-    {},
-    null
-  ],
   "enable": true,
   "type": "ctoken",
   "ignoreJSON": false,
@@ -30,7 +26,11 @@ exports['test/csrf.test.ts should update form with csrf token 1'] = {
     "signed": false,
     "httpOnly": false,
     "overwrite": true
-  }
+  },
+  "ignore": [
+    {},
+    null
+  ]
 }
 
 exports['test/csrf.test.ts apps/csrf-supported-requests-default-config should works without error because csrf = false override default config 1'] = {

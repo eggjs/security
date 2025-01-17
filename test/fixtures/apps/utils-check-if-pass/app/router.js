@@ -1,10 +1,8 @@
-'use strict';
-
 module.exports = function(app) {
-  app.get('/match', function *(){
+  app.get('/match', function(){
     this.body = 'hello';
   });
-  app.get('/luckydrq', function *(){
+  app.get('/luckydrq', function(){
     this.body = 'hello';
   });
 };
