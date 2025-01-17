@@ -1,28 +1,29 @@
-# egg-security
-
-Security plugin in egg
+# @eggjs/security
 
 [![NPM version][npm-image]][npm-url]
 [![Node.js CI](https://github.com/eggjs/security/actions/workflows/nodejs.yml/badge.svg)](https://github.com/eggjs/security/actions/workflows/nodejs.yml)
 [![Test coverage][codecov-image]][codecov-url]
 [![Known Vulnerabilities][snyk-image]][snyk-url]
 [![npm download][download-image]][download-url]
+[![Node.js Version](https://img.shields.io/node/v/eggjs/security.svg?style=flat)](https://nodejs.org/en/download/)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](https://makeapullrequest.com)
+![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/eggjs/security)
 
-[npm-image]: https://img.shields.io/npm/v/egg-security.svg?style=flat-square
-[npm-url]: https://npmjs.org/package/egg-security
+[npm-image]: https://img.shields.io/npm/v/@eggjs/security.svg?style=flat-square
+[npm-url]: https://npmjs.org/package/@eggjs/security
 [codecov-image]: https://codecov.io/gh/eggjs/security/branch/master/graph/badge.svg
 [codecov-url]: https://codecov.io/gh/eggjs/security
-[snyk-image]: https://snyk.io/test/npm/egg-security/badge.svg?style=flat-square
-[snyk-url]: https://snyk.io/test/npm/egg-security
-[download-image]: https://img.shields.io/npm/dm/egg-security.svg?style=flat-square
-[download-url]: https://npmjs.org/package/egg-security
+[snyk-image]: https://snyk.io/test/npm/@eggjs/security/badge.svg?style=flat-square
+[snyk-url]: https://snyk.io/test/npm/@eggjs/security
+[download-image]: https://img.shields.io/npm/dm/@eggjs/security.svg?style=flat-square
+[download-url]: https://npmjs.org/package/@eggjs/security
 
 Egg's default security plugin, generally no need to configure.
 
 ## Install
 
 ```bash
-npm i egg-security
+npm i @eggjs/security
 ```
 
 ## Usage & configuration
