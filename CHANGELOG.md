@@ -1,5 +1,52 @@
 # Changelog
 
+## [4.0.0](https://github.com/eggjs/security/compare/v3.7.0...v4.0.0) (2025-01-17)
+
+
+### ⚠ BREAKING CHANGES
+
+* drop Node.js < 18.19.0 support
+
+part of https://github.com/eggjs/egg/issues/3644
+
+https://github.com/eggjs/egg/issues/5257
+
+<!-- This is an auto-generated comment: release notes by coderabbit.ai
+-->
+## Summary by CodeRabbit
+
+Based on the comprehensive changes, here are the updated release notes:
+
+- **New Features**
+	- Migrated security plugin to TypeScript.
+	- Enhanced type safety for security configurations.
+	- Improved middleware and helper utilities.
+- Introduced new middleware for handling `Strict-Transport-Security`,
+`X-Frame-Options`, and `X-XSS-Protection` headers.
+	- Added support for new security configurations and helper functions.
+
+- **Breaking Changes**
+	- Renamed package from `egg-security` to `@eggjs/security`.
+	- Dropped support for Node.js versions below 18.19.0.
+	- Restructured module exports and configurations.
+	- Removed several deprecated middleware and utility functions.
+
+- **Security Improvements**
+	- Updated CSRF, XSS, and SSRF protection mechanisms.
+	- Enhanced middleware for handling security headers.
+	- Refined configuration options for various security features.
+
+- **Performance**
+	- Modernized codebase with ES module syntax.
+	- Improved type definitions and module structure.
+- Enhanced test suite with TypeScript support and better resource
+management.
+<!-- end of auto-generated comment: release notes by coderabbit.ai -->
+
+### Features
+
+* support cjs and esm both by tshy ([#101](https://github.com/eggjs/security/issues/101)) ([a11661f](https://github.com/eggjs/security/commit/a11661f3459db275f00b0f8bd0637a5e46b92022))
+
 ## [3.7.0](https://github.com/eggjs/egg-security/compare/v3.6.0...v3.7.0) (2025-01-13)
 
 
