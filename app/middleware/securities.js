@@ -13,9 +13,9 @@ module.exports = (_, app) => {
   }
 
   // format csrf.cookieDomain
-  const orginalCookieDomain = options.csrf.cookieDomain;
-  if (orginalCookieDomain && typeof orginalCookieDomain !== 'function') {
-    options.csrf.cookieDomain = () => orginalCookieDomain;
+  const originalCookieDomain = options.csrf.cookieDomain;
+  if (originalCookieDomain && typeof originalCookieDomain !== 'function') {
+    options.csrf.cookieDomain = () => originalCookieDomain;
   }
 
   defaultMiddleware.forEach(middlewareName => {
@@ -46,7 +46,10 @@ module.exports = (_, app) => {
       app.deprecate('[egg-security] Please use `config.security.xframe.ignore` instead, `config.security.xframe.blackUrls` will be removed very soon');
       opt.ignore = opt.blackUrls;
     }
-    opt.matching = createMatch(opt);
+    opt.matching = createMatch({
+      ...opt,
+      pathToRegexpModule: app.options.pathToRegexpModule,
+    });
 
     const fn = require(path.join(__dirname, '../../lib/middlewares', middlewareName))(opt, app);
     middlewares.push(fn);
