@@ -21,7 +21,7 @@
     "@eggjs/ip": "^2.0.2",
     "csrf": "^3.0.6",
     "delegates": "^1.0.0",
-    "egg-path-matching": "^1.0.0",
+    "egg-path-matching": "^1.2.0",
     "escape-html": "^1.0.3",
     "extend": "^3.0.1",
     "koa-compose": "^4.1.0",
@@ -43,7 +43,8 @@
     "eslint": "^8.40.0",
     "eslint-config-egg": "^12.2.1",
     "spy": "^1.0.0",
-    "supertest": "^6.3.3"
+    "supertest": "^6.3.3",
+    "path-to-regexp-v8": "npm:path-to-regexp@8"
   },
   "scripts": {
     "lint": "eslint .",

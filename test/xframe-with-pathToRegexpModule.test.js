@@ -1,33 +1,37 @@
 const { strict: assert } = require('node:assert');
 const mm = require('egg-mock');
 
-describe('test/xframe.test.js', () => {
+describe('test/xframe-with-pathToRegexpModule.test.js', () => {
   let app;
   let app2;
   let app3;
   let app4;
   before(async () => {
     app = mm.app({
-      baseDir: 'apps/iframe',
+      baseDir: 'apps/iframe-with-pathToRegexpModule',
       plugin: 'security',
+      pathToRegexpModule: require.resolve('path-to-regexp-v8'),
     });
     await app.ready();
 
     app2 = mm.app({
       baseDir: 'apps/iframe-novalue',
       plugin: 'security',
+      pathToRegexpModule: require.resolve('path-to-regexp-v8'),
     });
     await app2.ready();
 
     app3 = mm.app({
       baseDir: 'apps/iframe-allowfrom',
       plugin: 'security',
+      pathToRegexpModule: require.resolve('path-to-regexp-v8'),
     });
     await app3.ready();
 
     app4 = mm.app({
       baseDir: 'apps/iframe-black-urls',
       plugin: 'security',
+      pathToRegexpModule: require.resolve('path-to-regexp-v8'),
     });
     await app4.ready();
   });
@@ -75,11 +79,12 @@ describe('test/xframe.test.js', () => {
       .expect(200);
     assert.equal(res.headers['x-frame-options'], undefined);
 
+    // '/hello' won't match '/hello/other/world' on path-to-regexp@8
     res = await app.httpRequest()
       .get('/hello/other/world')
       .set('accept', 'text/html')
       .expect(200);
-    assert.equal(res.headers['x-frame-options'], undefined);
+    assert.equal(res.headers['x-frame-options'], 'SAMEORIGIN');
 
     res = await app4.httpRequest()
       .get('/hello')
