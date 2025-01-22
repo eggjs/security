@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.8.0](https://github.com/eggjs/security/compare/v3.7.0...v3.8.0) (2025-01-22)
+
+
+### Features
+
+* support custom pathToRegexpModule ([#102](https://github.com/eggjs/security/issues/102)) ([8e12a8e](https://github.com/eggjs/security/commit/8e12a8ebd379f7c49bdb90ce88d0df75ec7c8855))
+
 ## [3.7.0](https://github.com/eggjs/egg-security/compare/v3.6.0...v3.7.0) (2025-01-13)
 
 
