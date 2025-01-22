@@ -2,7 +2,7 @@ import type { ILifecycleBoot, EggCore } from '@eggjs/core';
 import { preprocessConfig } from './lib/utils.js';
 import { SecurityConfig } from './config/config.default.js';
 
-export default class AgentBoot implements ILifecycleBoot {
+export default class AppBoot implements ILifecycleBoot {
   private readonly app;
 
   constructor(app: EggCore) {
