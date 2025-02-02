@@ -270,9 +270,12 @@ export default class SecurityContext extends Context {
 
 declare module '@eggjs/core' {
   interface Context {
+    // @ts-ignore
     get securityOptions(): Partial<SecurityConfig & SecurityHelperConfig>;
     isSafeDomain(domain: string, customWhiteList?: string[]): boolean;
+    // @ts-ignore
     get nonce(): string;
+    // @ts-ignore
     get csrf(): string;
     ensureCsrfSecret(rotate?: boolean): void;
     rotateCsrfSecret(): void;

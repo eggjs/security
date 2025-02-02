@@ -63,7 +63,7 @@
     "@types/type-is": "^1.6.7",
     "beautify-benchmark": "^0.2.4",
     "benchmark": "^2.1.4",
-    "egg": "^4.0.1",
+    "egg": "^4.0.4",
     "egg-view-nunjucks": "^2.3.0",
     "eslint": "8",
     "eslint-config-egg": "14",
@@ -111,5 +111,6 @@
     "src"
   ],
   "types": "./dist/commonjs/index.d.ts",
-  "main": "./dist/commonjs/index.js"
+  "main": "./dist/commonjs/index.js",
+  "module": "./dist/esm/index.js"
 }
