@@ -270,9 +270,12 @@ export default class SecurityContext extends Context {
 
 declare module '@eggjs/core' {
   interface Context {
+    // @ts-expect-error duplicate identifier
     get securityOptions(): Partial<SecurityConfig & SecurityHelperConfig>;
     isSafeDomain(domain: string, customWhiteList?: string[]): boolean;
+    // @ts-expect-error duplicate identifier
     get nonce(): string;
+    // @ts-expect-error duplicate identifier
     get csrf(): string;
     ensureCsrfSecret(rotate?: boolean): void;
     rotateCsrfSecret(): void;
