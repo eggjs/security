@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.0.1](https://github.com/eggjs/security/compare/v4.0.0...v4.0.1) (2025-02-02)
+
+
+### Bug Fixes
+
+* ignore duplicate identifier ([#104](https://github.com/eggjs/security/issues/104)) ([2d1a44b](https://github.com/eggjs/security/commit/2d1a44b35c21fe5a3df3a82a2b11e97f7df95f41))
+
 ## [4.0.0](https://github.com/eggjs/security/compare/v3.7.0...v4.0.0) (2025-01-17)
 
 
